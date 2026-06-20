@@ -3,9 +3,8 @@ import { FocusScene } from '../focus/FocusScene'
 import { getUserId } from '../lib/identity'
 
 function copyInvite(code, toast) {
-  const url = `${window.location.origin}${window.location.pathname}?invite=${code}`
-  navigator.clipboard?.writeText(url).then(
-    () => toast('초대 링크를 복사했어요!', { variant: 'success' }),
+  navigator.clipboard?.writeText(code).then(
+    () => toast(`초대 코드 ${code} 를 복사했어요!`, { variant: 'success' }),
     () => toast(`초대 코드: ${code}`, { variant: 'info' }),
   )
 }
