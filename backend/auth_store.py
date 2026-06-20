@@ -56,5 +56,18 @@ class AuthStore:
     def _public(self, record: dict) -> dict:
         return {"user_id": record["user_id"], "display_name": record["display_name"]}
 
+    def display_name(self, user_id: str) -> str:
+        """user_id 로 표시 이름 조회. 멤버 이름을 서버가 신뢰해 채우기 위함.
+
+        가입하지 않은 id(예: 테스터/익명)는 보기 좋은 기본값을 돌려줍니다.
+        """
+        with self._lock:
+            for record in self._users.values():
+                if record["user_id"] == user_id:
+                    return record["display_name"]
+        if user_id == "tester-demo":
+            return "테스터"
+        return "익명"
+
 
 auth_store = AuthStore()

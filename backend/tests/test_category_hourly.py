@@ -13,23 +13,23 @@ def test_category_defaults_to_etc():
 def test_category_and_tags_persist_on_session():
     store = SessionStore()
     sess = store.create(
-        SessionCreate(task="알고리즘", duration_min=25, category="공부", tags=["코테", "파이썬"])
+        "u1", SessionCreate(task="알고리즘", duration_min=25, category="공부", tags=["코테", "파이썬"])
     )
     assert sess.category == "공부"
     assert sess.tags == ["코테", "파이썬"]
 
 
 def test_empty_category_breakdown_is_empty():
-    assert SessionStore().category_breakdown() == []
+    assert SessionStore().category_breakdown("u1") == []
 
 
 def test_category_breakdown_aggregates_minutes_and_tags():
     store = SessionStore()
-    store.create(SessionCreate(task="알고리즘", duration_min=25, category="공부", tags=["코테"]))
-    store.create(SessionCreate(task="영어", duration_min=15, category="공부", tags=["단어"]))
-    store.create(SessionCreate(task="러닝", duration_min=30, category="운동", tags=["유산소"]))
+    store.create("u1", SessionCreate(task="알고리즘", duration_min=25, category="공부", tags=["코테"]))
+    store.create("u1", SessionCreate(task="영어", duration_min=15, category="공부", tags=["단어"]))
+    store.create("u1", SessionCreate(task="러닝", duration_min=30, category="운동", tags=["유산소"]))
 
-    cats = store.category_breakdown()
+    cats = store.category_breakdown("u1")
     # sorted by minutes desc -> 공부(40) before 운동(30)
     assert cats[0].category == "공부"
     assert cats[0].minutes == 40
@@ -42,7 +42,7 @@ def test_category_breakdown_aggregates_minutes_and_tags():
 
 
 def test_empty_hourly_breakdown_has_24_zero_buckets():
-    buckets = SessionStore().hourly_breakdown()
+    buckets = SessionStore().hourly_breakdown("u1")
     assert len(buckets) == 24
     assert all(b.minutes == 0 for b in buckets)
     assert [b.hour for b in buckets] == list(range(24))
@@ -53,11 +53,11 @@ def test_hourly_breakdown_buckets_by_local_hour():
     # craft a session at a known KST hour (e.g. 14:30 KST today)
     now_kst = datetime.now(KST)
     at_14 = now_kst.replace(hour=14, minute=30, second=0, microsecond=0)
-    sess = store.create(SessionCreate(task="작업", duration_min=25, category="업무"))
+    sess = store.create("u1", SessionCreate(task="작업", duration_min=25, category="업무"))
     # overwrite created_at to the crafted time (stored as UTC internally is fine)
-    store._items[sess.id].created_at = at_14.astimezone(timezone.utc)
+    store._items("u1")[sess.id].created_at = at_14.astimezone(timezone.utc)
 
-    buckets = store.hourly_breakdown()
+    buckets = store.hourly_breakdown("u1")
     assert buckets[14].minutes == 25
     assert buckets[14].session_count == 1
     assert sum(b.minutes for b in buckets) == 25

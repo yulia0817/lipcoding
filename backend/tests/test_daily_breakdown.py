@@ -3,16 +3,16 @@ from session_store import SessionStore
 
 
 def test_empty_breakdown_is_empty_list():
-    assert SessionStore().daily_breakdown() == []
+    assert SessionStore().daily_breakdown("u1") == []
 
 
 def test_groups_sessions_by_day_and_aggregates_tasks():
     store = SessionStore()
-    store.create(SessionCreate(task="코딩", duration_min=25, completed=True))
-    store.create(SessionCreate(task="코딩", duration_min=25, completed=True))
-    store.create(SessionCreate(task="독서", duration_min=10, completed=True))
+    store.create("u1", SessionCreate(task="코딩", duration_min=25, completed=True))
+    store.create("u1", SessionCreate(task="코딩", duration_min=25, completed=True))
+    store.create("u1", SessionCreate(task="독서", duration_min=10, completed=True))
 
-    days = store.daily_breakdown()
+    days = store.daily_breakdown("u1")
     assert len(days) == 1  # all created "today"
     today = days[0]
     assert today.total_minutes == 60

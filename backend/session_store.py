@@ -23,44 +23,55 @@ from session_models import (
 KST = timezone(timedelta(hours=9))
 
 
+def _uid(user_id: str | None) -> str:
+    """사용자 식별자 정규화. 누락 시 익명('anon')으로 처리."""
+    return user_id or "anon"
+
+
 class SessionStore:
     def __init__(self) -> None:
-        self._items: Dict[str, Session] = {}
+        # 사용자별로 세션을 완전히 분리해서 보관합니다.
+        # {user_id: {session_id: Session}}
+        self._by_user: Dict[str, Dict[str, Session]] = defaultdict(dict)
         self._lock = Lock()
 
-    def list(self) -> List[Session]:
+    def _items(self, user_id: str | None) -> Dict[str, Session]:
+        return self._by_user[_uid(user_id)]
+
+    def list(self, user_id: str | None) -> List[Session]:
         with self._lock:
             return sorted(
-                self._items.values(),
+                self._items(user_id).values(),
                 key=lambda s: s.created_at,
                 reverse=True,
             )
 
-    def create(self, data: SessionCreate) -> Session:
+    def create(self, user_id: str | None, data: SessionCreate) -> Session:
         session = Session(id=uuid.uuid4().hex, **data.model_dump())
         with self._lock:
-            self._items[session.id] = session
+            self._items(user_id)[session.id] = session
         return session
 
-    def count(self) -> int:
+    def count(self, user_id: str | None) -> int:
         with self._lock:
-            return len(self._items)
+            return len(self._items(user_id))
 
-    def seed_many(self, sessions: List[Session]) -> int:
-        """데모 세션을 일괄 주입. 이미 데이터가 있으면 아무 것도 하지 않습니다."""
+    def seed_many(self, user_id: str | None, sessions: List[Session]) -> int:
+        """데모 세션을 특정 사용자에게 일괄 주입. 이미 데이터가 있으면 아무 것도 하지 않습니다."""
         with self._lock:
-            if self._items:
+            bucket = self._items(user_id)
+            if bucket:
                 return 0
             for s in sessions:
-                self._items[s.id] = s
+                bucket[s.id] = s
             return len(sessions)
 
     def _local_day(self, dt: datetime) -> date:
         return dt.astimezone(KST).date()
 
-    def stats(self) -> Stats:
+    def stats(self, user_id: str | None) -> Stats:
         with self._lock:
-            sessions = list(self._items.values())
+            sessions = list(self._items(user_id).values())
 
         today = datetime.now(KST).date()
         by_day: Dict[date, int] = defaultdict(int)
@@ -101,9 +112,9 @@ class SessionStore:
             heatmap=heatmap,
         )
 
-    def weekly_summary(self) -> WeeklySummary:
+    def weekly_summary(self, user_id: str | None) -> WeeklySummary:
         with self._lock:
-            sessions = list(self._items.values())
+            sessions = list(self._items(user_id).values())
 
         now = datetime.now(KST)
         week_start = now.date() - timedelta(days=now.weekday())  # Monday
@@ -159,9 +170,9 @@ class SessionStore:
             embers=embers,
         )
 
-    def daily_breakdown(self, days: int = 14) -> List[DayBreakdown]:
+    def daily_breakdown(self, user_id: str | None, days: int = 14) -> List[DayBreakdown]:
         with self._lock:
-            sessions = list(self._items.values())
+            sessions = list(self._items(user_id).values())
 
         cutoff = datetime.now(KST).date() - timedelta(days=days - 1)
         per_day: Dict[date, list[Session]] = defaultdict(list)
@@ -216,10 +227,10 @@ class SessionStore:
         return result
 
 
-    def hourly_breakdown(self, days: int = 7) -> List[HourBucket]:
+    def hourly_breakdown(self, user_id: str | None, days: int = 7) -> List[HourBucket]:
         """최근 N일 동안의 '시간대(0~23시, KST)별' 집중 분 분포."""
         with self._lock:
-            sessions = list(self._items.values())
+            sessions = list(self._items(user_id).values())
 
         cutoff = datetime.now(KST).date() - timedelta(days=days - 1)
         minutes = [0] * 24
@@ -235,10 +246,10 @@ class SessionStore:
             for h in range(24)
         ]
 
-    def category_breakdown(self, days: int = 30) -> List[CategoryStat]:
+    def category_breakdown(self, user_id: str | None, days: int = 30) -> List[CategoryStat]:
         """최근 N일 동안의 카테고리별 투자 시간 + 카테고리 내부 태그별 분."""
         with self._lock:
-            sessions = list(self._items.values())
+            sessions = list(self._items(user_id).values())
 
         cutoff = datetime.now(KST).date() - timedelta(days=days - 1)
         cat_min: Dict[str, int] = defaultdict(int)
