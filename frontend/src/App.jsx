@@ -11,6 +11,7 @@ import { DailyView } from './views/DailyView'
 import { ActivityView } from './views/ActivityView'
 import { StatsView } from './views/StatsView'
 import { ShopView } from './views/ShopView'
+import { GroupView } from './views/GroupView'
 import { LoginView } from './views/LoginView'
 import { HowToGuide } from './focus/HowToGuide'
 import { GamifyHud } from './gamify/GamifyHud'
@@ -20,6 +21,7 @@ import './focus/layout.css'
 
 const SUBTITLES = {
   campfire: '집중하면 모닥불이 타오릅니다',
+  together: '친구와 함께 집중해요. 각자의 집중이 모여 공동 목표를 채웁니다',
   journal: '한 주간의 집중을 돌아봐요 (월요일~일요일 기준)',
   daily: '날짜별로 무엇에 집중했는지 확인해요',
   activity: '시간대·카테고리별로 어디에 집중했는지 분석해요',
@@ -124,6 +126,7 @@ export default function App() {
           <div style={{ display: active === 'campfire' ? 'block' : 'none' }}>
             <CampfireView settings={settings} onSaved={refreshStats} gamify={gamify} />
           </div>
+          {active === 'together' && <GroupView />}
           {active === 'journal' && <JournalView />}
           {active === 'daily' && <DailyView />}
           {active === 'activity' && <ActivityView />}

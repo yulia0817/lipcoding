@@ -5,9 +5,14 @@ const BASE = import.meta.env.VITE_API_BASE || ''
 import { getUserId } from './lib/identity'
 
 async function req(path, options = {}) {
+  const { headers: extraHeaders, ...rest } = options
   const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json', 'X-User-Id': getUserId() },
-    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-User-Id': getUserId(),
+      ...extraHeaders,
+    },
+    ...rest,
   })
   if (!res.ok) {
     const raw = await res.text()
@@ -59,4 +64,35 @@ export const api = {
     req('/api/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   login: (data) =>
     req('/api/auth/login', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Teams (같이 집중)
+  createGroup: (name) =>
+    req('/api/teams', { method: 'POST', body: JSON.stringify({ name }) }),
+  joinGroup: (code) =>
+    req('/api/teams/join', { method: 'POST', body: JSON.stringify({ code }) }),
+  myGroups: () => req('/api/teams/mine'),
+  groupSummary: (id) => req(`/api/teams/${id}/summary`),
+  groupPresence: (id) => req(`/api/teams/${id}/presence`),
+  groupFeed: (id) => req(`/api/teams/${id}/feed`),
+  groupHeartbeat: (id, task) =>
+    req(`/api/teams/${id}/heartbeat`, { method: 'POST', body: JSON.stringify({ task }) }),
+
+  // GitHub 연동 (MVP: 공개 저장소 커밋)
+  ghHeaders: () => {
+    const h = {}
+    const repo = getGhRepo()
+    const token = getGhToken()
+    if (repo) h['X-GH-Repo'] = repo
+    if (token) h['X-GH-Token'] = token
+    return h
+  },
+  ghTest: () => req('/api/github/test', { headers: api.ghHeaders() }),
+  ghCommits: ({ since, until, author } = {}) => {
+    const qs = new URLSearchParams()
+    if (since) qs.set('since', since)
+    if (until) qs.set('until', until)
+    if (author) qs.set('author', author)
+    const q = qs.toString()
+    return req(`/api/github/commits${q ? `?${q}` : ''}`, { headers: api.ghHeaders() })
+  },
 }

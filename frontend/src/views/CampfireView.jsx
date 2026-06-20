@@ -212,6 +212,28 @@ export function CampfireView({ settings, onSaved, gamify }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionLive])
 
+  // 같이 집중: 집중 중에는 내 모임에 30초마다 접속 신호(heartbeat)를 보냅니다.
+  useEffect(() => {
+    if (!active) return undefined
+    let stopped = false
+    async function beat() {
+      try {
+        const mine = await api.myGroups()
+        if (stopped || !mine.length) return
+        const t = pendingSession.current?.task || '집중'
+        await Promise.allSettled(mine.map((g) => api.groupHeartbeat(g.id, t)))
+      } catch {
+        /* 무시 */
+      }
+    }
+    beat()
+    const h = setInterval(beat, 30000)
+    return () => {
+      stopped = true
+      clearInterval(h)
+    }
+  }, [active])
+
   // 키보드 단축키: Space=시작/정지, R=리셋, S=건너뛰기
   useHotkeys({
     toggle: () => {

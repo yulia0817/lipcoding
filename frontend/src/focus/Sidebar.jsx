@@ -9,6 +9,7 @@ import {
   IconCoffee,
   IconTag,
   IconPalette,
+  IconUsers,
 } from '../design/icons'
 
 const FOCUS_PRESETS = [15, 25, 45, 50]
@@ -16,6 +17,7 @@ const BREAK_PRESETS = [5, 10, 15]
 
 const NAV = [
   { id: 'campfire', Icon: IconFlame, label: '집중 타이머' },
+  { id: 'together', Icon: IconUsers, label: '같이 집중' },
   { id: 'journal', Icon: IconBook, label: '주간 리포트' },
   { id: 'daily', Icon: IconCalendar, label: '날짜별 기록' },
   { id: 'activity', Icon: IconTag, label: '활동 분석' },
