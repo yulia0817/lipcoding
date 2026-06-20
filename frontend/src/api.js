@@ -3,6 +3,7 @@
 const BASE = import.meta.env.VITE_API_BASE || ''
 
 import { getUserId } from './lib/identity'
+import { getRepo as getGhRepo, getToken as getGhToken } from './lib/github'
 
 async function req(path, options = {}) {
   const { headers: extraHeaders, ...rest } = options

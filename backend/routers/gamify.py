@@ -27,7 +27,7 @@ async def get_profile(x_user_id: str | None = Header(default=None)) -> Profile:
 async def earn(body: EarnBody, x_user_id: str | None = Header(default=None)) -> EarnResult:
     uid = _uid(x_user_id)
     result = profile_store.earn(uid, body.minutes, body.completed)
-    badges = evaluate_badges(session_store.list())
+    badges = evaluate_badges(session_store.list(uid))
     merged = profile_store.merge_badges(uid, badges)
     result.profile = merged
     return result
@@ -55,5 +55,5 @@ async def equip_skin(skin_id: str, x_user_id: str | None = Header(default=None))
 
 
 @router.get("/quests")
-async def quests() -> list[dict]:
-    return daily_quests(session_store.list())
+async def quests(x_user_id: str | None = Header(default=None)) -> list[dict]:
+    return daily_quests(session_store.list(_uid(x_user_id)))

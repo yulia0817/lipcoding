@@ -10,6 +10,7 @@ import { JournalView } from './views/JournalView'
 import { DailyView } from './views/DailyView'
 import { ActivityView } from './views/ActivityView'
 import { StatsView } from './views/StatsView'
+import { GithubView } from './views/GithubView'
 import { ShopView } from './views/ShopView'
 import { GroupView } from './views/GroupView'
 import { LoginView } from './views/LoginView'
@@ -130,6 +131,7 @@ export default function App() {
           {active === 'journal' && <JournalView />}
           {active === 'daily' && <DailyView />}
           {active === 'activity' && <ActivityView />}
+          {active === 'github' && <GithubView />}
           {active === 'stats' && <StatsView stats={stats} gamify={gamify} />}
           {active === 'shop' && <ShopView hook={gamify} />}
         </div>

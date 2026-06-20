@@ -288,3 +288,28 @@ export function IconUsers(props) {
     </Svg>
   )
 }
+
+// GitHub 연동 — git 브랜치
+export function IconGit(props) {
+  return (
+    <Svg {...props}>
+      <circle cx="6" cy="6" r="2.5" />
+      <circle cx="6" cy="18" r="2.5" />
+      <circle cx="18" cy="9" r="2.5" />
+      <path d="M6 8.5v7" />
+      <path d="M18 11.5a6 6 0 0 1-6 6H8.5" />
+    </Svg>
+  )
+}
+
+// 외부 링크
+export function IconExternal(props) {
+  return (
+    <Svg {...props}>
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <path d="M15 3h6v6" />
+      <path d="M10 14 21 3" />
+    </Svg>
+  )
+}
+
