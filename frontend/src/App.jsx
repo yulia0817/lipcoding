@@ -4,6 +4,7 @@ import { useToast } from './design'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { useProfile } from './hooks/useProfile'
 import { isLoggedIn, getDisplayName, clearUser } from './lib/identity'
+import { clearGitHubConfig } from './lib/github'
 import { Sidebar } from './focus/Sidebar'
 import { CampfireView } from './views/CampfireView'
 import { JournalView } from './views/JournalView'
@@ -53,6 +54,7 @@ export default function App() {
   }
 
   function logout() {
+    clearGitHubConfig()
     clearUser()
     setAuthed(false)
   }

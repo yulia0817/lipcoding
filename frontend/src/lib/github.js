@@ -1,28 +1,36 @@
 // GitHub 연동 설정(저장소/토큰) — localStorage 에만 보관(백엔드 영속 저장 안 함).
+// 사용자별로 분리: 키에 user_id 를 네임스페이스로 붙여 다른 계정의 repo/토큰이
+// 섞이거나 노출되지 않게 합니다.
+import { getUserId } from './identity'
+
 const REPO_KEY = 'fc_gh_repo'
 const TOKEN_KEY = 'fc_gh_token'
 const AUTHOR_KEY = 'fc_gh_author'
 
+function k(base) {
+  return `${base}:${getUserId()}`
+}
+
 export function getRepo() {
-  return localStorage.getItem(REPO_KEY) || ''
+  return localStorage.getItem(k(REPO_KEY)) || ''
 }
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY) || ''
+  return localStorage.getItem(k(TOKEN_KEY)) || ''
 }
 export function getAuthor() {
-  return localStorage.getItem(AUTHOR_KEY) || ''
+  return localStorage.getItem(k(AUTHOR_KEY)) || ''
 }
 
 export function setGitHubConfig({ repo, token, author }) {
-  if (repo !== undefined) localStorage.setItem(REPO_KEY, repo.trim())
-  if (token !== undefined) localStorage.setItem(TOKEN_KEY, token.trim())
-  if (author !== undefined) localStorage.setItem(AUTHOR_KEY, author.trim())
+  if (repo !== undefined) localStorage.setItem(k(REPO_KEY), repo.trim())
+  if (token !== undefined) localStorage.setItem(k(TOKEN_KEY), token.trim())
+  if (author !== undefined) localStorage.setItem(k(AUTHOR_KEY), author.trim())
 }
 
 export function clearGitHubConfig() {
-  localStorage.removeItem(REPO_KEY)
-  localStorage.removeItem(TOKEN_KEY)
-  localStorage.removeItem(AUTHOR_KEY)
+  localStorage.removeItem(k(REPO_KEY))
+  localStorage.removeItem(k(TOKEN_KEY))
+  localStorage.removeItem(k(AUTHOR_KEY))
 }
 
 export function isGitHubLinked() {
