@@ -60,11 +60,10 @@ export default function App() {
     setAuthed(false)
   }
 
+  // 사용법 안내는 자동으로 띄우지 않습니다(자동 모달이 클릭을 가로막는 문제 방지).
+  // 헤더의 '사용법' 버튼으로 언제든 열 수 있습니다.
   useEffect(() => {
-    if (!seenGuide) {
-      setHowToOpen(true)
-      setSeenGuide(true)
-    }
+    if (!seenGuide) setSeenGuide(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
