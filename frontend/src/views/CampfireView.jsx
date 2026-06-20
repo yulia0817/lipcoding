@@ -3,25 +3,57 @@ import { api } from '../api'
 import { Button, Card, IconButton, Input, Modal, Stack, useToast } from '../design'
 import { usePomodoro, formatTime } from '../hooks/usePomodoro'
 import { useSpeech } from '../hooks/useSpeech'
-import { Campfire } from '../focus/Campfire'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
+import { useNotification } from '../hooks/useNotification'
+import { useAmbient } from '../hooks/useAmbient'
+import { useHotkeys } from '../hooks/useHotkeys'
+import { useDailyGoal } from '../hooks/useDailyGoal'
+import { FocusScene } from '../focus/FocusScene'
+import { BreakCoach } from '../focus/BreakCoach'
+import { BreathingIntro } from '../focus/BreathingIntro'
+import { AmbientToolbar } from '../focus/AmbientToolbar'
+import { DailyGoal } from '../focus/DailyGoal'
+import { CategoryTagPicker, categoryIcon } from '../focus/CategoryTagPicker'
+import '../focus/quickwins.css'
+
+const LONG_BREAK_EVERY = 4
+const LONG_BREAK_MIN = 15
 
 // 집중 타이머 + 모닥불 메인 뷰. 시간 설정은 사이드바에서 props로 받습니다.
-export function CampfireView({ settings, onSaved }) {
+export function CampfireView({ settings, onSaved, gamify }) {
   const [task, setTask] = useState('')
+  const [category, setCategory] = useState('공부')
+  const [tags, setTags] = useState([])
   const [retroOpen, setRetroOpen] = useState(false)
   const [retro, setRetro] = useState('')
   const [voiceUsed, setVoiceUsed] = useState(false)
+  const [breathing, setBreathing] = useState(false)
+  const [pendingBreak, setPendingBreak] = useState(false)
+  const [cycleCount, setCycleCount] = useState(0)
   const pendingSession = useRef(null)
   const { toast } = useToast()
   const speech = useSpeech()
+  const notif = useNotification()
+  const ambient = useAmbient()
+  const goal = useDailyGoal()
+
+  // 4세션마다 긴 휴식. 휴식 길이를 타이머 훅에 직접 반영해 자연스럽게 전환됩니다.
+  const isLongBreak = cycleCount > 0 && cycleCount % LONG_BREAK_EVERY === 0
+  const effectiveBreakMin = isLongBreak ? LONG_BREAK_MIN : settings.breakMin
   const timer = usePomodoro({
     focusMin: settings.focusMin,
-    breakMin: settings.breakMin,
+    breakMin: effectiveBreakMin,
   })
+
+  // 타이머가 도는 동안 브라우저 탭 제목에 카운트다운 표시
+  useDocumentTitle(timer.running, timer.mode, timer.remaining)
 
   useEffect(() => {
     if (timer.finished && timer.mode === 'focus' && pendingSession.current) {
       pendingSession.current.completed = true
+      setCycleCount((c) => c + 1)
+      goal.markDone()
+      notif.notify('🔥 집중 완료!', '장작 하나가 추가됐어요. 잠깐 쉬어볼까요?')
       setRetroOpen(true)
       toast('🔥 집중 완료! 모닥불이 활활 타올랐어요', { variant: 'success' })
     }
@@ -38,20 +70,30 @@ export function CampfireView({ settings, onSaved }) {
   }
 
   function startFocus() {
-    const t = task.trim()
-    if (!t) {
+    if (!task.trim()) {
       toast('무엇에 집중할지 먼저 입력하세요', { variant: 'info' })
       return
     }
+    if (notif.supported && notif.permission === 'default') notif.request()
+    setBreathing(true)
+  }
+
+  // 호흡 인트로가 끝난 뒤 실제 집중 타이머를 시작합니다.
+  function doStartFocus() {
+    setBreathing(false)
+    const t = task.trim()
+    if (!t) return
     pendingSession.current = {
       task: t,
       completed: false,
       source: voiceUsed ? 'voice' : 'text',
+      category,
+      tags: [...tags],
     }
     timer.resetDistraction()
     timer.reset('focus')
     timer.start()
-    toast(`"${t}" 집중 시작!`, { variant: 'info' })
+    toast(`${categoryIcon(category)} "${t}" 집중 시작!`, { variant: 'info' })
   }
 
   function pauseOrResume() {
@@ -81,6 +123,7 @@ export function CampfireView({ settings, onSaved }) {
   async function saveSession() {
     const p = pendingSession.current
     if (!p) return
+    const wasCompleted = !!p.completed
     const durationMin = p.completed ? settings.focusMin : p._elapsedMin || 1
     try {
       await api.createSession({
@@ -90,8 +133,18 @@ export function CampfireView({ settings, onSaved }) {
         distracted_min: Math.round(timer.distractedSec / 60),
         retro: retro.trim() || null,
         source: p.source,
+        category: p.category || '기타',
+        tags: p.tags || [],
       })
       toast('세션을 기록했어요', { variant: 'success' })
+      if (gamify) {
+        const result = await gamify.earn(durationMin, p.completed)
+        if (result?.leveled_up) {
+          toast(`🎉 레벨 업! Lv.${result.new_level}`, { variant: 'success' })
+        } else {
+          toast(`🪵 +${result.coins_gained} 장작 획득`, { variant: 'info' })
+        }
+      }
     } catch (e) {
       toast(`저장 실패: ${e}`, { variant: 'error' })
     } finally {
@@ -99,18 +152,83 @@ export function CampfireView({ settings, onSaved }) {
       setRetro('')
       setRetroOpen(false)
       setTask('')
+      setTags([])
       setVoiceUsed(false)
-      timer.reset('focus')
+      timer.resetDistraction()
+      // 집중을 끝까지 완료했으면 휴식 모드로 전환(4세션마다 긴 휴식).
+      if (wasCompleted) {
+        setPendingBreak(true)
+      } else {
+        timer.reset('focus')
+      }
       onSaved && onSaved()
     }
   }
 
+  // 긴/짧은 휴식 시작: cycleCount 반영 후 effectiveBreakMin이 갱신된 시점에 실행.
+  useEffect(() => {
+    if (!pendingBreak) return
+    timer.reset('break')
+    timer.start()
+    toast(
+      isLongBreak ? '🌙 긴 휴식 시간이에요. 푹 쉬세요!' : '잠깐 쉬며 몸을 풀어볼까요?',
+      { variant: 'info' },
+    )
+    setPendingBreak(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingBreak, effectiveBreakMin])
+
+  // 휴식이 끝나면 다시 집중 모드로 정리.
+  useEffect(() => {
+    if (timer.finished && timer.mode === 'break') {
+      notif.notify('☕ 휴식 끝!', '다시 집중해볼까요?')
+      toast('휴식 끝! 다시 집중해볼까요?', { variant: 'success' })
+      timer.reset('focus')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timer.finished, timer.mode])
+
   const intensity = timer.mode === 'focus' ? timer.progress : 0.2
   const active = timer.running && timer.mode === 'focus'
   const idle = !timer.running && !pendingSession.current
+  const breakMode = timer.mode === 'break'
+
+  // 키보드 단축키: Space=시작/정지, R=리셋, S=건너뛰기
+  useHotkeys({
+    toggle: () => {
+      if (breathing) return
+      if (idle) startFocus()
+      else if (pendingSession.current) pauseOrResume()
+    },
+    reset: () => {
+      if (!pendingSession.current && !breakMode) return
+      pendingSession.current = null
+      setPendingBreak(false)
+      timer.reset('focus')
+    },
+    skip: () => {
+      if (breakMode) timer.reset('focus')
+      else if (pendingSession.current) stopFocus()
+    },
+  })
 
   return (
     <>
+      <BreathingIntro open={breathing} onDone={doStartFocus} />
+      {breakMode ? (
+        <BreakCoach
+          remainingLabel={formatTime(timer.remaining)}
+          onSkip={() => timer.reset('focus')}
+        />
+      ) : (
+      <>
+      <DailyGoal
+        goal={goal.goal}
+        progress={goal.progress}
+        onGoal={goal.setGoal}
+        reached={goal.reached}
+      />
+      <AmbientToolbar ambient={ambient} notif={notif} />
       {idle && (
         <div className="hero-guide">
           <span className="hero-guide__icon">🪵</span>
@@ -123,9 +241,20 @@ export function CampfireView({ settings, onSaved }) {
       )}
 
       <Card>
-        <Campfire intensity={intensity} active={active} />
+        <FocusScene
+          skinId={gamify?.profile?.equipped_skin || 'campfire'}
+          intensity={intensity}
+          active={active}
+        />
         {pendingSession.current?.task && (
-          <p className="focus-task">🎯 {pendingSession.current.task}</p>
+          <p className="focus-task">
+            {categoryIcon(pendingSession.current.category)} {pendingSession.current.task}
+            {pendingSession.current.tags?.length > 0 && (
+              <span className="focus-task__tags">
+                {pendingSession.current.tags.map((t) => ` #${t}`).join('')}
+              </span>
+            )}
+          </p>
         )}
         <p className="timer__mode">{timer.mode === 'focus' ? '집중 시간' : '휴식 시간'}</p>
         <div className="timer__time">{formatTime(timer.remaining)}</div>
@@ -148,6 +277,15 @@ export function CampfireView({ settings, onSaved }) {
           </Stack>
         )}
 
+        {idle && (
+          <CategoryTagPicker
+            category={category}
+            onCategory={setCategory}
+            tags={tags}
+            onTags={setTags}
+          />
+        )}
+
         {pendingSession.current && (
           <div className="timer__controls">
             <Button variant="secondary" onClick={pauseOrResume}>
@@ -159,6 +297,8 @@ export function CampfireView({ settings, onSaved }) {
           </div>
         )}
       </Card>
+      </>
+      )}
 
       <Modal
         open={retroOpen}

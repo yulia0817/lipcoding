@@ -1,0 +1,164 @@
+/* Quick Win 기능 스타일: 호흡 인트로 · 앰비언트 툴바 · 오늘의 목표 */
+
+/* 호흡 인트로 오버레이 */
+.breathing {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-5);
+  background: radial-gradient(circle at center, #2a1810 0%, #140b07 70%, #0a0604 100%);
+  cursor: pointer;
+  animation: breathing-fade 0.4s ease;
+}
+@keyframes breathing-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.breathing__circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ff9d4d 0%, #ff6b1a 55%, rgba(255, 107, 26, 0) 75%);
+  box-shadow: 0 0 60px 20px rgba(255, 140, 50, 0.4);
+  animation: breathing-pulse 3.5s ease-in-out infinite;
+}
+@keyframes breathing-pulse {
+  0%, 100% { transform: scale(0.6); opacity: 0.7; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+.breathing__text {
+  color: #ffe7d0;
+  font-size: var(--ds-fs-lg);
+  text-align: center;
+  line-height: 1.7;
+  margin: 0;
+}
+.breathing__sub {
+  font-size: var(--ds-fs-sm);
+  color: #d9b89a;
+}
+
+/* 앰비언트 + 알림 + 단축키 툴바 */
+.qw-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-bottom: var(--ds-space-3);
+}
+.qw-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  flex-wrap: wrap;
+}
+.qw-chip {
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  border-radius: var(--ds-radius-pill);
+  padding: 6px 12px;
+  font-size: var(--ds-fs-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.qw-chip:hover:not(:disabled) {
+  border-color: var(--ds-primary);
+}
+.qw-chip.is-on {
+  background: var(--ds-primary-soft);
+  border-color: var(--ds-primary);
+  color: var(--ds-primary);
+  font-weight: var(--ds-fw-medium);
+}
+.qw-chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.qw-volume {
+  width: 90px;
+  accent-color: var(--ds-primary);
+}
+.qw-hint {
+  margin-left: auto;
+  font-size: var(--ds-fs-sm);
+  color: var(--ds-text-muted);
+}
+
+/* 오늘의 모닥불 목표 */
+.daily-goal {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-3);
+  margin-bottom: var(--ds-space-3);
+}
+.daily-goal.is-reached {
+  border-color: var(--ds-primary);
+  background: var(--ds-primary-soft);
+}
+.daily-goal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+}
+.daily-goal__title {
+  font-size: var(--ds-fs-md);
+  color: var(--ds-text);
+}
+.daily-goal__steppers {
+  display: inline-flex;
+  gap: 4px;
+}
+.daily-goal__steppers button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  border-radius: var(--ds-radius-sm);
+  cursor: pointer;
+  font-size: var(--ds-fs-md);
+  line-height: 1;
+}
+.daily-goal__steppers button:hover {
+  border-color: var(--ds-primary);
+}
+.daily-goal__flames {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: var(--ds-space-2) 0;
+}
+.daily-goal__flame {
+  font-size: 18px;
+  filter: grayscale(1) opacity(0.5);
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+.daily-goal__flame.is-lit {
+  filter: none;
+  transform: scale(1.05);
+}
+.daily-goal__bar {
+  height: 8px;
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-bg);
+  overflow: hidden;
+}
+.daily-goal__fill {
+  height: 100%;
+  border-radius: var(--ds-radius-pill);
+  background: linear-gradient(90deg, #ff8a3d, #ff5722);
+  transition: width 0.4s ease;
+}
+.daily-goal__done {
+  margin: var(--ds-space-2) 0 0;
+  font-size: var(--ds-fs-sm);
+  color: var(--ds-primary);
+  font-weight: var(--ds-fw-medium);
+}
