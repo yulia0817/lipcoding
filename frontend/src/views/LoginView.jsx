@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { api } from '../api'
 import { Button, Card, Input, Stack, useToast } from '../design'
 import { enterAsTester, setUser } from '../lib/identity'
+import { getRepo, setGitHubConfig } from '../lib/github'
 import './login.css'
 
 // 자체 간단 로그인: 무거운 OAuth 없이 아이디/비밀번호로 가입·로그인.
@@ -51,6 +52,10 @@ export function LoginView({ onAuthed }) {
 
   function tester() {
     enterAsTester()
+    // 데모용: 지금 작업 중인 저장소를 미리 채워 GitHub 연동을 바로 체험하게 합니다.
+    if (!getRepo()) {
+      setGitHubConfig({ repo: 'yulia0817/lipcoding', author: '' })
+    }
     toast('테스터로 입장했어요. 저장된 예시 데이터를 둘러보세요.', { variant: 'info' })
     onAuthed()
   }
