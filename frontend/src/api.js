@@ -10,8 +10,17 @@ async function req(path, options = {}) {
     ...options,
   })
   if (!res.ok) {
-    const detail = await res.text()
-    throw new Error(`${res.status} ${detail}`)
+    const raw = await res.text()
+    let message = raw
+    try {
+      const parsed = JSON.parse(raw)
+      if (parsed && typeof parsed.detail === 'string') message = parsed.detail
+    } catch {
+      // 본문이 JSON이 아니면 원문 사용
+    }
+    const error = new Error(message || `요청 실패 (${res.status})`)
+    error.status = res.status
+    throw error
   }
   if (res.status === 204) return null
   return res.json()

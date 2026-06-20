@@ -33,8 +33,17 @@ export function LoginView({ onAuthed }) {
       toast(`${res.display_name}님 환영해요!`, { variant: 'success' })
       onAuthed()
     } catch (err) {
-      const msg = String(err).replace(/^Error:\s*\d+\s*/, '')
-      toast(msg || '로그인에 실패했어요', { variant: 'error' })
+      const msg = err?.message?.replace(/^Error:\s*/, '') || ''
+      const isDuplicate = err?.status === 400 && /이미 사용/.test(msg)
+      if (isDuplicate) {
+        toast('이미 사용 중인 아이디예요. 로그인으로 전환할게요.', { variant: 'info' })
+        setMode('login')
+        setPassword('')
+      } else {
+        toast(msg || (isRegister ? '가입에 실패했어요' : '로그인에 실패했어요'), {
+          variant: 'error',
+        })
+      }
     } finally {
       setBusy(false)
     }
