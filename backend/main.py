@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import focus, items, voice, gamify, auth, github, team
+from routers import focus, items, voice, gamify, auth, github, team, standup
 from session_store import session_store
 
 app = FastAPI(title="Focus Campfire API", version="0.2.0")
@@ -25,6 +25,7 @@ app.include_router(gamify.router)
 app.include_router(auth.router)
 app.include_router(github.router)
 app.include_router(team.router)
+app.include_router(standup.router)
 
 
 @app.on_event("startup")
