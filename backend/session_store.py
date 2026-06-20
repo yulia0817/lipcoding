@@ -42,6 +42,19 @@ class SessionStore:
             self._items[session.id] = session
         return session
 
+    def count(self) -> int:
+        with self._lock:
+            return len(self._items)
+
+    def seed_many(self, sessions: List[Session]) -> int:
+        """데모 세션을 일괄 주입. 이미 데이터가 있으면 아무 것도 하지 않습니다."""
+        with self._lock:
+            if self._items:
+                return 0
+            for s in sessions:
+                self._items[s.id] = s
+            return len(sessions)
+
     def _local_day(self, dt: datetime) -> date:
         return dt.astimezone(KST).date()
 

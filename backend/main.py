@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers import focus, items, voice, gamify
+from session_store import session_store
 
 app = FastAPI(title="Focus Campfire API", version="0.2.0")
 
@@ -21,6 +22,19 @@ app.include_router(items.router)
 app.include_router(voice.router)
 app.include_router(focus.router)
 app.include_router(gamify.router)
+
+
+@app.on_event("startup")
+async def _seed_demo() -> None:
+    # 저장소가 비어 있고 SEED_DEMO!=0 이면 데모 데이터를 채웁니다.
+    if os.getenv("SEED_DEMO", "1") == "0":
+        return
+    if session_store.count() == 0:
+        from demo_seed import build_demo_sessions
+
+        n = session_store.seed_many(build_demo_sessions())
+        if n:
+            print(f"[seed] demo sessions inserted: {n}")
 
 
 @app.get("/")
