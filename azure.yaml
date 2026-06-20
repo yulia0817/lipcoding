@@ -3,15 +3,10 @@ metadata:
   description: "LipCoding - 음성 입력 생산성 앱"
 
 services:
-  frontend:
-    project: ./frontend
-    language: nodejs
-    host: appservice
-    
   backend:
     project: ./backend
     language: python
-    host: appservice
+    host: containerapp
 
 infra:
   path: ./infra
