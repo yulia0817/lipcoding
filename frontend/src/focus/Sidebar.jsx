@@ -11,6 +11,7 @@ import {
   IconPalette,
   IconUsers,
   IconGit,
+  IconClipboard,
 } from '../design/icons'
 
 const FOCUS_PRESETS = [15, 25, 45, 50]
@@ -23,6 +24,7 @@ const NAV = [
   { id: 'daily', Icon: IconCalendar, label: '날짜별 기록' },
   { id: 'activity', Icon: IconTag, label: '활동 분석' },
   { id: 'github', Icon: IconGit, label: 'GitHub 연동' },
+  { id: 'standup', Icon: IconClipboard, label: 'AI 스탠드업' },
   { id: 'stats', Icon: IconChart, label: '통계' },
   { id: 'shop', Icon: IconPalette, label: '스킨 보관함' },
 ]

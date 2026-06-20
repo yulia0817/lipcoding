@@ -96,4 +96,7 @@ export const api = {
     const q = qs.toString()
     return req(`/api/github/commits${q ? `?${q}` : ''}`, { headers: api.ghHeaders() })
   },
+
+  // AI 스탠드업 (세션 + 커밋 기반 어제/오늘/블로커 요약)
+  standup: () => req('/api/standup', { headers: api.ghHeaders() }),
 }
