@@ -45,7 +45,7 @@ export function StandupView() {
     <div className="stv">
       <header className="stv__head">
         <h2 className="stv__title">
-          <IconClipboard size={22} /> AI 스탠드업
+          <IconClipboard size={22} /> 스탠드업
         </h2>
         <p className="stv__sub">
           어제·오늘 집중 기록과 커밋을 모아 데일리 스탠드업을 자동으로 만들어요.
@@ -65,7 +65,7 @@ export function StandupView() {
           )}
           {data?.source && (
             <span className={`stv__src stv__src--${data.source}`}>
-              {data.source === 'ai' ? 'AI 생성' : '템플릿 생성'}
+              {data.source === 'ai' ? '자동 생성' : '템플릿 생성'}
             </span>
           )}
         </div>
