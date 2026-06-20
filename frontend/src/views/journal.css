@@ -1,12 +1,70 @@
-.journal-hero {
-  text-align: center;
-  padding: 8px 0 4px;
+.journal-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+  flex-wrap: wrap;
 }
-.journal-hero__fire { font-size: 36px; letter-spacing: 2px; }
-.journal-hero__total { font-size: 28px; font-weight: 700; margin: 8px 0 0; }
-.journal-hero__top { color: var(--ds-text-muted, #999); margin: 4px 0 12px; }
-.journal-keywords { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-.ember { display: flex; gap: 10px; align-items: baseline; }
-.ember__date { color: var(--ds-text-muted, #999); font-size: 12px; min-width: 84px; }
+.journal-range {
+  font-size: var(--ds-fs-sm);
+  color: var(--ds-text-muted, #999);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 주간 통계 4분할 */
+.journal-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--ds-space-2);
+  margin-bottom: var(--ds-space-3);
+}
+.jstat {
+  text-align: center;
+  padding: var(--ds-space-3) var(--ds-space-2);
+  border-radius: var(--ds-radius-md, 12px);
+  background: var(--ds-bg, #f6f6f7);
+}
+.jstat__value {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ds-text);
+}
+.jstat__value span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text-muted, #999);
+  margin-left: 2px;
+}
+.jstat__label {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--ds-text-muted, #999);
+}
+
+.journal-top {
+  font-size: var(--ds-fs-sm);
+  color: var(--ds-text);
+  padding: var(--ds-space-2) 0;
+  border-top: 1px solid var(--ds-border);
+}
+.journal-keywords {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: var(--ds-space-2);
+}
+
+.ember { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.ember__date {
+  color: var(--ds-text-muted, #999);
+  font-size: 12px;
+  min-width: 84px;
+  font-variant-numeric: tabular-nums;
+}
 .ember__task { font-weight: 600; }
-.ember__retro { color: var(--ds-text-muted, #999); }
+.ember__retro { color: var(--ds-text-muted, #999); font-style: italic; }
+
+@media (max-width: 560px) {
+  .journal-stats { grid-template-columns: repeat(2, 1fr); }
+}

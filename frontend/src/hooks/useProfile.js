@@ -7,10 +7,10 @@ export function useProfile() {
   const [quests, setQuests] = useState([])
 
   const refresh = useCallback(async () => {
-    const [p, s, q] = await Promise.all([api.profile(), api.skins(), api.quests()])
-    setProfile(p)
-    setSkins(s)
-    setQuests(q)
+    const [p, s, q] = await Promise.allSettled([api.profile(), api.skins(), api.quests()])
+    if (p.status === 'fulfilled') setProfile(p.value)
+    if (s.status === 'fulfilled') setSkins(s.value)
+    if (q.status === 'fulfilled') setQuests(q.value)
   }, [])
 
   useEffect(() => {

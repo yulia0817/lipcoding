@@ -35,4 +35,19 @@ export const api = {
   dailyBreakdown: () => req('/api/breakdown/daily'),
   hourlyBreakdown: () => req('/api/breakdown/hourly'),
   categoryBreakdown: () => req('/api/breakdown/category'),
+
+  // Gamify (프로필 / 스킨 / 퀘스트)
+  profile: () => req('/api/profile'),
+  earn: ({ minutes, completed }) =>
+    req('/api/earn', { method: 'POST', body: JSON.stringify({ minutes, completed }) }),
+  skins: () => req('/api/skins'),
+  quests: () => req('/api/quests'),
+  buySkin: (id) => req(`/api/skins/${id}/buy`, { method: 'POST' }),
+  equipSkin: (id) => req(`/api/skins/${id}/equip`, { method: 'POST' }),
+
+  // Auth (자체 간단 로그인)
+  register: (data) =>
+    req('/api/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+  login: (data) =>
+    req('/api/auth/login', { method: 'POST', body: JSON.stringify(data) }),
 }

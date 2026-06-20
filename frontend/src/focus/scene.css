@@ -1,25 +1,176 @@
 .scene {
   position: relative;
-  height: 180px;
+  height: 220px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  border-radius: 16px;
-  background: radial-gradient(circle at 50% 70%, var(--scene-accent) -40%, var(--scene-bg) 70%);
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 90% at 50% 100%, var(--scene-accent) -55%, transparent 55%),
+    linear-gradient(180deg, var(--scene-bg1) 0%, var(--scene-bg2) 100%);
   overflow: hidden;
-  transition: background 0.4s ease;
+  transition: background 0.5s ease;
+  box-shadow: inset 0 -40px 60px -30px rgba(0, 0, 0, 0.6);
 }
+
+/* 중앙 불꽃/심볼 */
 .scene__flame {
-  font-size: 64px;
+  position: relative;
+  z-index: 3;
+  font-size: 68px;
+  margin-bottom: 26px;
   transform-origin: center bottom;
   transition: transform 0.3s ease, filter 0.3s ease;
-  animation: scene-flicker 1.6s ease-in-out infinite;
+  animation: scene-flicker 1.7s ease-in-out infinite;
 }
-.scene--idle .scene__flame { animation: none; opacity: 0.6; }
+.scene--idle .scene__flame {
+  animation: scene-sway 4s ease-in-out infinite;
+  opacity: 0.7;
+}
 @keyframes scene-flicker {
   0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-3px) scale(1.06); }
+  25% { transform: translateY(-2px) scale(1.05) rotate(-1.5deg); }
+  60% { transform: translateY(-4px) scale(1.08) rotate(1.5deg); }
 }
+@keyframes scene-sway {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.03); }
+}
+
+/* 바닥 광원 */
+.scene__ground {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  width: 60%;
+  height: 26px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, var(--scene-accent) 0%, transparent 70%);
+  opacity: 0.55;
+  filter: blur(4px);
+  z-index: 2;
+  animation: ground-pulse 2.4s ease-in-out infinite;
+}
+.scene--idle .scene__ground { opacity: 0.25; animation: none; }
+@keyframes ground-pulse {
+  0%, 100% { opacity: 0.45; transform: translateX(-50%) scaleX(1); }
+  50% { opacity: 0.65; transform: translateX(-50%) scaleX(1.12); }
+}
+
+/* 파티클 공통 */
+.scene__particles {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.scene__particle {
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* 불씨(ember) — 아래에서 위로 떠오름 */
+.scene--ember .scene__particle,
+.scene__particles--ember .scene__particle {
+  bottom: 18px;
+  background: radial-gradient(circle, var(--scene-accent2) 0%, var(--scene-accent) 60%, transparent 100%);
+  box-shadow: 0 0 6px var(--scene-accent);
+  animation-name: ember-rise;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-out;
+}
+@keyframes ember-rise {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateY(-170px) translateX(12px) scale(0.3); opacity: 0; }
+}
+
+/* 불꽃 튀김(spark) — 해변, 살짝 흩날림 */
+.scene__particles--spark .scene__particle {
+  bottom: 26px;
+  background: radial-gradient(circle, #fff 0%, var(--scene-accent2) 50%, transparent 100%);
+  box-shadow: 0 0 8px var(--scene-accent2);
+  animation-name: spark-fly;
+  animation-iteration-count: infinite;
+}
+@keyframes spark-fly {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-120px) translateX(40px) scale(0.2); opacity: 0; }
+}
+
+/* 반딧불(firefly) — 부드럽게 떠다니며 깜빡임 */
+.scene__particles--firefly .scene__particle {
+  background: radial-gradient(circle, #fff6a8 0%, var(--scene-accent2) 60%, transparent 100%);
+  box-shadow: 0 0 8px #d9ff7a;
+  animation-name: firefly-float;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+@keyframes firefly-float {
+  0%, 100% { transform: translate(0, 0); opacity: 0.2; }
+  25% { transform: translate(14px, -18px); opacity: 1; }
+  50% { transform: translate(-10px, -30px); opacity: 0.6; }
+  75% { transform: translate(8px, -14px); opacity: 0.9; }
+}
+
+/* 비(rain) — 위에서 아래로 */
+.scene--rain .scene__particle,
+.scene__particles--rain .scene__particle {
+  top: -10%;
+  width: 2px !important;
+  border-radius: 1px;
+  background: linear-gradient(180deg, transparent, var(--scene-accent2));
+  opacity: 0.6;
+  animation-name: rain-fall;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+@keyframes rain-fall {
+  0% { transform: translateY(-20px); opacity: 0; }
+  10% { opacity: 0.7; }
+  100% { transform: translateY(240px); opacity: 0; }
+}
+
+/* 별(star) — 제자리 반짝임 */
+.scene__particles--star .scene__particle {
+  background: #fff;
+  box-shadow: 0 0 6px #cfe8ff;
+  animation-name: star-twinkle;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* 오로라 커튼 */
+.scene__aurora {
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 80%;
+  z-index: 1;
+  filter: blur(18px);
+  opacity: 0.55;
+  mix-blend-mode: screen;
+}
+.scene__aurora--a {
+  background: linear-gradient(100deg, transparent, var(--scene-accent) 40%, transparent 70%);
+  animation: aurora-sweep 9s ease-in-out infinite;
+}
+.scene__aurora--b {
+  background: linear-gradient(80deg, transparent 30%, var(--scene-accent2) 55%, transparent 85%);
+  animation: aurora-sweep 12s ease-in-out infinite reverse;
+}
+@keyframes aurora-sweep {
+  0%, 100% { transform: translateX(-12%) skewX(-8deg) scaleY(1); opacity: 0.4; }
+  50% { transform: translateX(12%) skewX(8deg) scaleY(1.15); opacity: 0.7; }
+}
+
+.scene--idle .scene__particles { opacity: 0.45; }
+
 @media (prefers-reduced-motion: reduce) {
-  .scene__flame { animation: none; }
+  .scene__flame, .scene__particle, .scene__ground, .scene__aurora { animation: none !important; }
 }

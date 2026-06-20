@@ -1,4 +1,5 @@
 import { Button } from '../design'
+import './slider.css'
 import {
   IconFlame,
   IconBook,
@@ -14,8 +15,8 @@ const FOCUS_PRESETS = [15, 25, 45, 50]
 const BREAK_PRESETS = [5, 10, 15]
 
 const NAV = [
-  { id: 'campfire', Icon: IconFlame, label: '캠프파이어' },
-  { id: 'journal', Icon: IconBook, label: '불씨 저널' },
+  { id: 'campfire', Icon: IconFlame, label: '집중 타이머' },
+  { id: 'journal', Icon: IconBook, label: '주간 리포트' },
   { id: 'daily', Icon: IconCalendar, label: '날짜별 기록' },
   { id: 'activity', Icon: IconTag, label: '활동 분석' },
   { id: 'stats', Icon: IconChart, label: '통계' },
@@ -97,6 +98,22 @@ export function Sidebar({
             />
             <span>분</span>
           </label>
+          <div className="sidebar__slider-row">
+            <input
+              type="range"
+              className="sidebar__slider"
+              min="5"
+              max="120"
+              step="5"
+              value={Math.min(120, settings.focusMin)}
+              onChange={(e) =>
+                onSettings({ ...settings, focusMin: clamp(e.target.value, 1, 180) })
+              }
+              style={{ '--pct': `${((Math.min(120, settings.focusMin) - 5) / 115) * 100}%` }}
+              aria-label="집중 시간 슬라이더"
+            />
+            <span className="sidebar__slider-val">{settings.focusMin}분</span>
+          </div>
 
           <div className="sidebar__section-title"><IconCoffee size={15} /> 휴식 시간</div>
           <div className="sidebar__presets">
@@ -110,6 +127,22 @@ export function Sidebar({
                 {m}분
               </button>
             ))}
+          </div>
+          <div className="sidebar__slider-row">
+            <input
+              type="range"
+              className="sidebar__slider"
+              min="1"
+              max="30"
+              step="1"
+              value={Math.min(30, settings.breakMin)}
+              onChange={(e) =>
+                onSettings({ ...settings, breakMin: clamp(e.target.value, 1, 60) })
+              }
+              style={{ '--pct': `${((Math.min(30, settings.breakMin) - 1) / 29) * 100}%` }}
+              aria-label="휴식 시간 슬라이더"
+            />
+            <span className="sidebar__slider-val">{settings.breakMin}분</span>
           </div>
 
           <p className="sidebar__hint">

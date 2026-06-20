@@ -1,3 +1,4 @@
+import { IconLog } from '../design/icons'
 import '../nav/nav.css'
 
 export function GamifyHud({ profile }) {
@@ -9,7 +10,7 @@ export function GamifyHud({ profile }) {
       <div className="hud__xp">
         <div className="hud__xp-fill" style={{ width: `${intoLevel}%` }} />
       </div>
-      <span className="hud__coins">🪵 {profile.coins}</span>
+      <span className="hud__coins"><IconLog size={15} /> {profile.coins}</span>
     </div>
   )
 }

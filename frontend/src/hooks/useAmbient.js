@@ -3,10 +3,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // 앰비언트 사운드 훅. 오디오 파일 없이 Web Audio API로 노이즈를 생성합니다.
 // 모닥불(🔥)/빗소리(🌧️)/숲(🌲) 채널을 제공해 집중 분위기를 만들어요.
 export const AMBIENT_PRESETS = [
-  { id: 'off', label: '🔇 끄기' },
-  { id: 'fire', label: '🔥 모닥불' },
-  { id: 'rain', label: '🌧️ 빗소리' },
-  { id: 'forest', label: '🌲 숲' },
+  { id: 'off', label: '끄기' },
+  { id: 'fire', label: '모닥불' },
+  { id: 'rain', label: '빗소리' },
+  { id: 'forest', label: '숲' },
 ]
 
 function makeNoiseSource(ctx) {

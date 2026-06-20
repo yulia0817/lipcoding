@@ -3,6 +3,15 @@ import { api } from '../api'
 import { Card, EmptyState, Stack, useToast } from '../design'
 import './daily.css'
 
+const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
+function fmtDate(iso) {
+  const d = new Date(`${iso}T00:00:00`)
+  if (Number.isNaN(d.getTime())) return iso
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}.${mm}.${dd} (${WEEKDAYS[d.getDay()]})`
+}
+
 export function DailyView() {
   const [days, setDays] = useState(null)
   const { toast } = useToast()
@@ -37,25 +46,61 @@ export function DailyView() {
           return (
             <Card key={d.date}>
               <div className="day-card__head">
-                <span className="day-card__date">{d.date}</span>
+                <span className="day-card__date">{fmtDate(d.date)}</span>
                 <span className="day-card__total">
-                  {d.total_minutes}분 · {d.session_count}세션
+                  <strong>{d.total_minutes}</strong>분 · {d.session_count}세션
                 </span>
               </div>
-              {d.tasks.map((t) => (
+              {d.tasks.map((t, ti) => (
                 <div className="day-task" key={t.task}>
                   <div className="day-task__label">
                     <span>{t.task}</span>
-                    <span>{t.minutes}분</span>
+                    <span className="day-task__min">{t.minutes}분</span>
                   </div>
                   <div className="day-task__track">
                     <div
                       className="day-task__bar"
-                      style={{ width: `${(t.minutes / max) * 100}%` }}
+                      style={{
+                        width: `${(t.minutes / max) * 100}%`,
+                        '--bar-hue': `${(ti * 47) % 360}`,
+                      }}
                     />
                   </div>
                 </div>
               ))}
+              {d.entries && d.entries.length > 0 && (
+                <div className="day-timeline">
+                  <div className="day-timeline__title">타임라인</div>
+                  {d.entries.map((e, i) => (
+                    <div
+                      className={`tl-row${e.completed ? '' : ' tl-row--incomplete'}`}
+                      key={`${e.start}-${i}`}
+                    >
+                      <span className="tl-time">
+                        {e.start}–{e.end}
+                      </span>
+                      <span className="tl-dot" aria-hidden />
+                      <div className="tl-body">
+                        <div className="tl-main">
+                          <span className="tl-task">{e.task}</span>
+                          <span className="tl-cat">{e.category}</span>
+                          <span className="tl-dur">{e.duration_min}분</span>
+                          {!e.completed && <span className="tl-badge">중단</span>}
+                          {e.distracted_min > 0 && (
+                            <span className="tl-badge tl-badge--warn">
+                              딴짓 {e.distracted_min}분
+                            </span>
+                          )}
+                          {e.source === 'voice' && (
+                            <span className="tl-badge tl-badge--voice">음성</span>
+                          )}
+                        </div>
+                        {e.retro && <div className="tl-retro">“{e.retro}”</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
           )
         })}

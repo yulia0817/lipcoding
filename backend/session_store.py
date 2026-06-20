@@ -183,12 +183,34 @@ class SessionStore:
                 for t in per_task_min
             ]
             tasks.sort(key=lambda x: x["minutes"], reverse=True)
+
+            entries = []
+            for s in day_sessions:
+                end_dt = s.created_at.astimezone(KST)
+                start_dt = end_dt - timedelta(minutes=s.duration_min)
+                entries.append(
+                    {
+                        "start": start_dt.strftime("%H:%M"),
+                        "end": end_dt.strftime("%H:%M"),
+                        "task": s.task,
+                        "category": s.category,
+                        "duration_min": s.duration_min,
+                        "completed": s.completed,
+                        "distracted_min": s.distracted_min,
+                        "retro": s.retro,
+                        "source": s.source,
+                        "tags": s.tags,
+                    }
+                )
+            entries.sort(key=lambda e: e["start"])
+
             result.append(
                 DayBreakdown(
                     date=day.isoformat(),
                     total_minutes=sum(s.duration_min for s in day_sessions),
                     session_count=len(day_sessions),
                     tasks=tasks,
+                    entries=entries,
                 )
             )
         return result

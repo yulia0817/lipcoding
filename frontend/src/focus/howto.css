@@ -1,0 +1,59 @@
+.howto__steps {
+  list-style: none;
+  margin: 0 0 var(--ds-space-4);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+}
+.howto__step {
+  display: flex;
+  gap: var(--ds-space-3);
+  align-items: flex-start;
+}
+.howto__num {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ds-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.howto__title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.howto__desc {
+  font-size: var(--ds-fs-sm);
+  color: var(--ds-text-muted);
+  line-height: 1.5;
+}
+.howto__tips {
+  border-top: 1px solid var(--ds-border);
+  padding-top: var(--ds-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+}
+.howto__tip {
+  display: flex;
+  gap: var(--ds-space-2);
+  font-size: var(--ds-fs-sm);
+  align-items: baseline;
+}
+.howto__tip-key {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 100px;
+  font-weight: 600;
+}
+.howto__tip-val {
+  color: var(--ds-text-muted);
+  line-height: 1.5;
+}

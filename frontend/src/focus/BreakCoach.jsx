@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Button, Card, Stack } from '../design'
+import { IconVolume, IconMaximize } from '../design/icons'
 import { BREAK_ACTIVITIES, randomActivityIndex } from './breakActivities'
 
 // 휴식 모드에서 보여주는 스트레칭 코치.
 // - 앉아서 할 수 있는 동작을 하나씩 안내
 // - "다른 동작"으로 순환, "들려주기"로 음성 안내(SpeechSynthesis, ko-KR)
-export function BreakCoach({ remainingLabel, onSkip }) {
+export function BreakCoach({ remainingLabel, onSkip, onImmersive }) {
   const [idx, setIdx] = useState(() => randomActivityIndex())
   const activity = BREAK_ACTIVITIES[idx]
   const ttsSupported =
@@ -51,7 +52,16 @@ export function BreakCoach({ remainingLabel, onSkip }) {
         <Button variant="secondary" onClick={next}>
           다른 동작
         </Button>
-        {ttsSupported && <Button onClick={speak}>들려주기</Button>}
+        {ttsSupported && (
+          <Button onClick={speak}>
+            <IconVolume size={15} /> 음성 안내
+          </Button>
+        )}
+        {onImmersive && (
+          <Button variant="ghost" onClick={onImmersive}>
+            <IconMaximize size={15} /> 전체화면
+          </Button>
+        )}
         {onSkip && (
           <Button variant="ghost" onClick={onSkip}>
             건너뛰기

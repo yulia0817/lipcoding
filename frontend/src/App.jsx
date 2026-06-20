@@ -3,6 +3,7 @@ import { api } from './api'
 import { useToast } from './design'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { useProfile } from './hooks/useProfile'
+import { isLoggedIn, getDisplayName, clearUser } from './lib/identity'
 import { Sidebar } from './focus/Sidebar'
 import { CampfireView } from './views/CampfireView'
 import { JournalView } from './views/JournalView'
@@ -10,6 +11,8 @@ import { DailyView } from './views/DailyView'
 import { ActivityView } from './views/ActivityView'
 import { StatsView } from './views/StatsView'
 import { ShopView } from './views/ShopView'
+import { LoginView } from './views/LoginView'
+import { HowToGuide } from './focus/HowToGuide'
 import { GamifyHud } from './gamify/GamifyHud'
 import './focus/campfire.css'
 import './focus/focus.css'
@@ -17,7 +20,7 @@ import './focus/layout.css'
 
 const SUBTITLES = {
   campfire: '집중하면 모닥불이 타오릅니다',
-  journal: '한 줄 회고가 불씨로 쌓여요',
+  journal: '한 주간의 집중을 돌아봐요 (월요일~일요일 기준)',
   daily: '날짜별로 무엇에 집중했는지 확인해요',
   activity: '시간대·카테고리별로 어디에 집중했는지 분석해요',
   stats: '오늘의 집중과 연속 기록',
@@ -35,7 +38,29 @@ export default function App() {
   const [collapsed, setCollapsed] = useLocalStorage('focus-sidebar-collapsed', false)
   const [active, setActive] = useState('campfire')
   const [stats, setStats] = useState(null)
+  const [howToOpen, setHowToOpen] = useState(false)
+  const [seenGuide, setSeenGuide] = useLocalStorage('focus-seen-guide', false)
+  const [authed, setAuthed] = useState(() => isLoggedIn())
   const gamify = useProfile()
+
+  function handleAuthed() {
+    setAuthed(true)
+    gamify.refresh().catch(() => {})
+    refreshStats()
+  }
+
+  function logout() {
+    clearUser()
+    setAuthed(false)
+  }
+
+  useEffect(() => {
+    if (!seenGuide) {
+      setHowToOpen(true)
+      setSeenGuide(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function refreshStats() {
     try {
@@ -49,6 +74,10 @@ export default function App() {
     refreshStats()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  if (!authed) {
+    return <LoginView onAuthed={handleAuthed} />
+  }
 
   return (
     <div className="layout">
@@ -64,8 +93,29 @@ export default function App() {
       <div className="layout__main">
         <div className="app">
           <header className="app__header">
-            <h1>🔥 Focus Scene</h1>
-            <p className="app__sub">{SUBTITLES[active]}</p>
+            <div className="app__header-main">
+              <h1>Focus Scene</h1>
+              <p className="app__sub">{SUBTITLES[active]}</p>
+            </div>
+            <div className="app__header-actions">
+              <span className="app__user">{getDisplayName()}님</span>
+              <button
+                type="button"
+                className="app__help"
+                onClick={() => setHowToOpen(true)}
+                title="사용법 보기"
+              >
+                ? 사용법
+              </button>
+              <button
+                type="button"
+                className="app__help"
+                onClick={logout}
+                title="로그아웃"
+              >
+                로그아웃
+              </button>
+            </div>
           </header>
 
           <GamifyHud profile={gamify.profile} />
@@ -81,6 +131,7 @@ export default function App() {
           {active === 'shop' && <ShopView hook={gamify} />}
         </div>
       </div>
+      <HowToGuide open={howToOpen} onClose={() => setHowToOpen(false)} />
     </div>
   )
 }

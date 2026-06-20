@@ -8,7 +8,7 @@ export function useDocumentTitle(running, mode, remaining, base = 'Focus Scene')
       const m = Math.floor(remaining / 60)
       const s = remaining % 60
       const clock = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-      const icon = mode === 'focus' ? '🔥' : '☕'
+      const icon = mode === 'focus' ? '⏱' : '☕'
       const label = mode === 'focus' ? '집중' : '휴식'
       document.title = `${icon} ${clock} · ${label}`
     } else {

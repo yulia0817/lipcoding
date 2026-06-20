@@ -1,7 +1,7 @@
 /* Quick Win 기능 스타일: 호흡 인트로 · 앰비언트 툴바 · 오늘의 목표 */
 
-/* 호흡 인트로 오버레이 */
-.breathing {
+/* 스킨별 시작 인트로 오버레이 (장착 스킨에 맞춰 색·심볼·문구가 세트로 바뀜) */
+.intro {
   position: fixed;
   inset: 0;
   z-index: 1000;
@@ -10,36 +10,62 @@
   align-items: center;
   justify-content: center;
   gap: var(--ds-space-5);
-  background: radial-gradient(circle at center, #2a1810 0%, #140b07 70%, #0a0604 100%);
+  background: radial-gradient(circle at 50% 45%, var(--scene-bg1) 0%, var(--scene-bg2) 70%, #04060a 100%);
   cursor: pointer;
-  animation: breathing-fade 0.4s ease;
+  animation: intro-fade 0.4s ease;
+  overflow: hidden;
 }
-@keyframes breathing-fade {
+@keyframes intro-fade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-.breathing__circle {
-  width: 120px;
-  height: 120px;
+.intro__glow {
+  position: absolute;
+  width: 260px;
+  height: 260px;
   border-radius: 50%;
-  background: radial-gradient(circle, #ff9d4d 0%, #ff6b1a 55%, rgba(255, 107, 26, 0) 75%);
-  box-shadow: 0 0 60px 20px rgba(255, 140, 50, 0.4);
-  animation: breathing-pulse 3.5s ease-in-out infinite;
+  background: radial-gradient(circle, var(--scene-accent2) 0%, var(--scene-accent) 45%, transparent 72%);
+  filter: blur(8px);
+  opacity: 0.5;
+  animation: intro-glow 3.8s ease-in-out infinite;
 }
-@keyframes breathing-pulse {
-  0%, 100% { transform: scale(0.6); opacity: 0.7; }
-  50% { transform: scale(1.4); opacity: 1; }
+@keyframes intro-glow {
+  0% { transform: scale(0.4); opacity: 0.2; }
+  50% { transform: scale(1.25); opacity: 0.7; }
+  100% { transform: scale(0.9); opacity: 0.45; }
 }
-.breathing__text {
-  color: #ffe7d0;
+.intro__symbol {
+  position: relative;
+  font-size: 92px;
+  filter: drop-shadow(0 0 28px var(--scene-accent));
+  animation: intro-symbol 3.8s ease-out;
+}
+@keyframes intro-symbol {
+  0% { transform: scale(0.2) translateY(20px); opacity: 0; }
+  35% { transform: scale(1.1) translateY(0); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.intro__text {
+  position: relative;
+  color: #fff;
   font-size: var(--ds-fs-lg);
   text-align: center;
   line-height: 1.7;
   margin: 0;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
 }
-.breathing__sub {
+.intro__sub {
   font-size: var(--ds-fs-sm);
-  color: #d9b89a;
+  color: rgba(255, 255, 255, 0.72);
+}
+.intro__skip {
+  position: absolute;
+  bottom: 32px;
+  font-size: var(--ds-fs-sm);
+  color: rgba(255, 255, 255, 0.45);
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro__glow, .intro__symbol { animation: none; }
 }
 
 /* 앰비언트 + 알림 + 단축키 툴바 */
@@ -57,6 +83,9 @@
   flex-wrap: wrap;
 }
 .qw-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   border: 1px solid var(--ds-border);
   background: var(--ds-surface);
   color: var(--ds-text);
@@ -129,20 +158,24 @@
 .daily-goal__steppers button:hover {
   border-color: var(--ds-primary);
 }
-.daily-goal__flames {
+.daily-goal__dots {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
+  gap: 6px;
   margin: var(--ds-space-2) 0;
 }
-.daily-goal__flame {
-  font-size: 18px;
-  filter: grayscale(1) opacity(0.5);
-  transition: filter 0.2s ease, transform 0.2s ease;
+.daily-goal__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ds-border);
+  background: transparent;
+  transition: all 0.2s ease;
 }
-.daily-goal__flame.is-lit {
-  filter: none;
-  transform: scale(1.05);
+.daily-goal__dot.is-lit {
+  background: var(--ds-primary);
+  border-color: var(--ds-primary);
+  transform: scale(1.1);
 }
 .daily-goal__bar {
   height: 8px;
@@ -161,4 +194,35 @@
   font-size: var(--ds-fs-sm);
   color: var(--ds-primary);
   font-weight: var(--ds-fw-medium);
+}
+
+/* 휴식 수동 진입 */
+.break-entry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-3);
+  padding-top: var(--ds-space-3);
+  border-top: 1px dashed var(--ds-border);
+}
+.break-entry__text {
+  font-size: var(--ds-fs-sm);
+  color: var(--ds-text-muted);
+}
+
+/* 앰비언트 툴바 소리 라벨 */
+.qw-toolbar__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--ds-fs-sm);
+  color: var(--ds-text-muted);
+  margin-right: 2px;
+  white-space: nowrap;
+}
+.qw-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }

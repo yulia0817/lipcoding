@@ -1,15 +1,23 @@
 import { useState } from 'react'
 import { Input, Tag } from '../design'
+import {
+  IconBook,
+  IconDumbbell,
+  IconBriefcase,
+  IconBookOpen,
+  IconBrush,
+  IconSparkle,
+} from '../design/icons'
 import './category.css'
 
-// 카테고리 프리셋 (이모지 + 라벨)
+// 카테고리 프리셋 (선 아이콘 + 라벨)
 export const CATEGORIES = [
-  { id: '공부', icon: '📚' },
-  { id: '운동', icon: '💪' },
-  { id: '업무', icon: '💼' },
-  { id: '독서', icon: '📖' },
-  { id: '취미', icon: '🎨' },
-  { id: '기타', icon: '✨' },
+  { id: '공부', Icon: IconBook },
+  { id: '운동', Icon: IconDumbbell },
+  { id: '업무', Icon: IconBriefcase },
+  { id: '독서', Icon: IconBookOpen },
+  { id: '취미', Icon: IconBrush },
+  { id: '기타', Icon: IconSparkle },
 ]
 
 // 자주 쓰는 태그 제안 (커스텀 입력도 가능)
@@ -25,7 +33,13 @@ const SUGGESTED_TAGS = [
 ]
 
 export function categoryIcon(id) {
-  return CATEGORIES.find((c) => c.id === id)?.icon || '✨'
+  return CATEGORIES.find((c) => c.id === id)?.Icon || IconSparkle
+}
+
+// 카테고리 아이콘을 인라인으로 렌더 (toast 등 문자열에는 사용 불가)
+export function CategoryIcon({ id, size = 15 }) {
+  const Icon = categoryIcon(id)
+  return <Icon size={size} />
 }
 
 // 카테고리 선택 + 태그(프리셋/커스텀) 추가 UI
@@ -58,7 +72,7 @@ export function CategoryTagPicker({ category, onCategory, tags, onTags }) {
             className={`catchip ${category === c.id ? 'is-on' : ''}`}
             onClick={() => onCategory(c.id)}
           >
-            <span className="catchip__icon">{c.icon}</span>
+            <span className="catchip__icon"><c.Icon size={15} /></span>
             {c.id}
           </button>
         ))}

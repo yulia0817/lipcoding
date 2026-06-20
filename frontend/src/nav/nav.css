@@ -9,4 +9,4 @@
 .hud__level { font-weight: 700; color: var(--ds-primary); }
 .hud__xp { width: 120px; height: 8px; background: var(--ds-border); border-radius: 999px; overflow: hidden; }
 .hud__xp-fill { height: 100%; background: var(--ds-primary); transition: width 0.4s ease; }
-.hud__coins { font-weight: 600; }
+.hud__coins { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }

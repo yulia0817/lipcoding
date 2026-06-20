@@ -1,0 +1,55 @@
+/* 사이드바 집중/휴식 시간 시크 슬라이더 */
+.sidebar__slider-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-2);
+}
+.sidebar__slider {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 6px;
+  border-radius: var(--ds-radius-pill);
+  background: linear-gradient(
+    to right,
+    var(--ds-primary) 0%,
+    var(--ds-primary) var(--pct, 50%),
+    var(--ds-border) var(--pct, 50%),
+    var(--ds-border) 100%
+  );
+  outline: none;
+  cursor: pointer;
+}
+.sidebar__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--ds-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.12s ease;
+}
+.sidebar__slider::-webkit-slider-thumb:hover {
+  transform: scale(1.18);
+}
+.sidebar__slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--ds-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+.sidebar__slider:focus-visible {
+  box-shadow: var(--ds-focus-ring);
+}
+.sidebar__slider-val {
+  min-width: 42px;
+  text-align: right;
+  font-size: var(--ds-fs-sm);
+  font-weight: var(--ds-fw-medium);
+  color: var(--ds-text);
+}

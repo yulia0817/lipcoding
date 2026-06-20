@@ -3,6 +3,13 @@ import { api } from '../api'
 import { Card, EmptyState, Stack, Tag, useToast } from '../design'
 import './journal.css'
 
+function fmtRange(start, end) {
+  if (!start || !end) return ''
+  const s = start.slice(5).replace('-', '.')
+  const e = end.slice(5).replace('-', '.')
+  return `${s} ~ ${e}`
+}
+
 export function JournalView() {
   const [summary, setSummary] = useState(null)
   const { toast } = useToast()
@@ -16,36 +23,61 @@ export function JournalView() {
   }, [])
 
   if (!summary) {
-    return <EmptyState icon="🪵" title="불씨를 모으는 중" description="잠시만요." />
+    return <EmptyState icon="📖" title="이번 주 기록을 불러오는 중" description="잠시만요." />
   }
 
-  const fire = '🔥'.repeat(summary.fire_level) || '🪵'
+  const range = fmtRange(summary.week_start, summary.week_end)
+  const avgPerSession = summary.session_count
+    ? Math.round(summary.total_minutes / summary.session_count)
+    : 0
 
   return (
     <>
-      <div className="section-title">이번 주 모닥불</div>
+      <div className="journal-head">
+        <span className="section-title">이번 주 요약</span>
+        <span className="journal-range">{range} · 월~일</span>
+      </div>
+
       <Card>
-        <div className="journal-hero">
-          <div className="journal-hero__fire">{fire}</div>
-          <div className="journal-hero__total">{summary.total_minutes}분 집중</div>
-          <div className="journal-hero__top">
-            {summary.top_task
-              ? `가장 오래 집중: ${summary.top_task} (${summary.top_task_minutes}분)`
-              : '아직 이번 주 기록이 없어요'}
+        <div className="journal-stats">
+          <div className="jstat">
+            <div className="jstat__value">{summary.total_minutes}<span>분</span></div>
+            <div className="jstat__label">총 집중</div>
           </div>
+          <div className="jstat">
+            <div className="jstat__value">{summary.session_count}<span>회</span></div>
+            <div className="jstat__label">세션</div>
+          </div>
+          <div className="jstat">
+            <div className="jstat__value">{summary.completed_count}<span>회</span></div>
+            <div className="jstat__label">완료</div>
+          </div>
+          <div className="jstat">
+            <div className="jstat__value">{avgPerSession}<span>분</span></div>
+            <div className="jstat__label">세션 평균</div>
+          </div>
+        </div>
+
+        <div className="journal-top">
+          {summary.top_task
+            ? <>가장 오래 집중한 일 · <strong>{summary.top_task}</strong> ({summary.top_task_minutes}분)</>
+            : '아직 이번 주 기록이 없어요'}
+        </div>
+
+        {summary.keywords.length > 0 && (
           <div className="journal-keywords">
             {summary.keywords.map((k) => (
               <Tag key={k}>#{k}</Tag>
             ))}
           </div>
-        </div>
+        )}
       </Card>
 
-      <div className="section-title">불씨 모음</div>
+      <div className="section-title">한 줄 회고</div>
       {summary.embers.length === 0 ? (
         <EmptyState
-          icon="✨"
-          title="아직 남긴 불씨가 없어요"
+          icon="✍️"
+          title="아직 남긴 회고가 없어요"
           description="집중 후 한 줄 회고를 남기면 여기 쌓입니다."
         />
       ) : (

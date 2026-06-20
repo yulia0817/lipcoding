@@ -1,0 +1,137 @@
+/* 전체화면 몰입 모드 */
+.immersive {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background: #000;
+  animation: immersive-in 0.4s ease;
+}
+@keyframes immersive-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 스킨 씬이 화면을 가득 채움 */
+.immersive .scene--fill {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+.immersive .scene--fill .scene__flame {
+  font-size: 140px;
+  margin-bottom: 8vh;
+}
+.immersive .scene--fill .scene__ground {
+  bottom: 6vh;
+  width: 46%;
+  height: 60px;
+}
+
+/* 중앙 오버레이 (시간) */
+.immersive__center {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
+}
+.immersive__task {
+  margin: 0 0 4px;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+}
+.immersive__mode {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+.immersive__time {
+  font-size: clamp(72px, 16vw, 180px);
+  font-weight: 800;
+  line-height: 1.05;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.immersive__controls {
+  margin-top: 22px;
+  display: flex;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+/* 우상단 컨트롤 바 (소리 토글 + 축소) */
+.immersive__topbar {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  z-index: 6;
+  display: flex;
+  gap: 10px;
+}
+.immersive__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s ease, opacity 0.6s ease;
+}
+.immersive__btn:hover {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+/* 현재 시각 (좌상단) */
+.immersive__clock {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  z-index: 6;
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  transition: opacity 0.6s ease;
+}
+
+/* 마우스 정지 시 시계만 남기고 컨트롤 페이드 아웃 */
+.immersive--dim .immersive__topbar,
+.immersive--dim .immersive__controls,
+.immersive--dim .immersive__task,
+.immersive--dim .immersive__mode {
+  opacity: 0;
+}
+.immersive--dim {
+  cursor: none;
+}
+.immersive__topbar,
+.immersive__controls,
+.immersive__task,
+.immersive__mode {
+  transition: opacity 0.6s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .immersive { animation: none; }
+}

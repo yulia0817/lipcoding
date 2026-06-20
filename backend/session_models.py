@@ -54,6 +54,7 @@ class DayBreakdown(BaseModel):
     total_minutes: int
     session_count: int
     tasks: list[dict]
+    entries: list[dict] = []  # 세션별 타임라인 [{start, end, task, ...}]
 
 
 class HourBucket(BaseModel):

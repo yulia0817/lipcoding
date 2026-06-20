@@ -19,3 +19,9 @@ backend/.pytest_cache/
 .env.*.local
 
 .azure/
+
+# 데모 스크린샷/캡처 스크립트 (커밋 제외)
+frontend/shots/
+frontend/capture-all.cjs
+frontend/shots.cjs
+intro/

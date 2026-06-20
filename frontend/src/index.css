@@ -18,6 +18,12 @@ body {
   padding: var(--ds-space-6) var(--ds-space-5) 64px;
 }
 
+.app__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+}
 .app__header h1 {
   margin: 0;
   font-size: var(--ds-fs-xl);
@@ -26,6 +32,26 @@ body {
 .app__sub {
   margin: var(--ds-space-1) 0 var(--ds-space-5);
   color: var(--ds-text-muted);
+}
+.app__help {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  padding: 6px 12px;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-surface);
+  color: var(--ds-text-muted);
+  font-size: var(--ds-fs-sm);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.app__help:hover {
+  border-color: var(--ds-primary);
+  color: var(--ds-primary);
 }
 
 .app__composer {
