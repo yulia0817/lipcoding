@@ -1,0 +1,25 @@
+.scene {
+  position: relative;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 70%, var(--scene-accent) -40%, var(--scene-bg) 70%);
+  overflow: hidden;
+  transition: background 0.4s ease;
+}
+.scene__flame {
+  font-size: 64px;
+  transform-origin: center bottom;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  animation: scene-flicker 1.6s ease-in-out infinite;
+}
+.scene--idle .scene__flame { animation: none; opacity: 0.6; }
+@keyframes scene-flicker {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene__flame { animation: none; }
+}

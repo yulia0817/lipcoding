@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 // 타이머가 도는 동안 브라우저 탭 제목에 남은 시간을 표시합니다.
 // 탭을 전환해도 불꽃 이모지와 카운트다운이 보여요. (Pomodor.app 스타일)
-export function useDocumentTitle(running, mode, remaining, base = 'Focus Campfire') {
+export function useDocumentTitle(running, mode, remaining, base = 'Focus Scene') {
   useEffect(() => {
     if (running) {
       const m = Math.floor(remaining / 60)

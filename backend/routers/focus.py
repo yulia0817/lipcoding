@@ -1,7 +1,15 @@
 """집중 세션 라우터: 세션 저장/조회 + 통계."""
 from fastapi import APIRouter
 
-from session_models import Session, SessionCreate, Stats, WeeklySummary, DayBreakdown
+from session_models import (
+    Session,
+    SessionCreate,
+    Stats,
+    WeeklySummary,
+    DayBreakdown,
+    HourBucket,
+    CategoryStat,
+)
 from session_store import session_store
 
 router = APIRouter(prefix="/api", tags=["focus"])
@@ -30,3 +38,13 @@ async def weekly_summary() -> WeeklySummary:
 @router.get("/breakdown/daily", response_model=list[DayBreakdown])
 async def daily_breakdown() -> list[DayBreakdown]:
     return session_store.daily_breakdown()
+
+
+@router.get("/breakdown/hourly", response_model=list[HourBucket])
+async def hourly_breakdown() -> list[HourBucket]:
+    return session_store.hourly_breakdown()
+
+
+@router.get("/breakdown/category", response_model=list[CategoryStat])
+async def category_breakdown() -> list[CategoryStat]:
+    return session_store.category_breakdown()

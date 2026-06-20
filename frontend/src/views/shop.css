@@ -1,0 +1,6 @@
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.skin-card { text-align: center; padding: 16px 12px; }
+.skin-card__emoji { font-size: 40px; }
+.skin-card__name { font-weight: 700; margin: 6px 0 2px; }
+.skin-card__desc { font-size: 12px; color: var(--ds-text-muted); min-height: 32px; }
+.skin-card__action { margin-top: 10px; }

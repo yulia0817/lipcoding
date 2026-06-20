@@ -1,0 +1,10 @@
+.quest { margin: 10px 0; }
+.quest__top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+.quest__reward { color: var(--ds-primary); }
+.quest__track { height: 8px; background: var(--ds-border); border-radius: 999px; overflow: hidden; }
+.quest__fill { height: 100%; background: var(--ds-primary); }
+.badge-shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 10px; }
+.badge { text-align: center; opacity: 0.25; }
+.badge.is-earned { opacity: 1; }
+.badge__emoji { font-size: 28px; }
+.badge__name { font-size: 11px; color: var(--ds-text-muted); }

@@ -95,7 +95,8 @@
   color: var(--ds-primary);
   font-weight: var(--ds-fw-medium);
 }
-.sidebar__nav-icon { font-size: 1.1rem; }
+.sidebar__nav-icon { font-size: 1.1rem; display: inline-flex; align-items: center; color: var(--ds-text-muted); }
+.sidebar__nav-item.is-active .sidebar__nav-icon { color: var(--ds-primary); }
 
 /* 설정 영역 */
 .sidebar__settings {
@@ -107,6 +108,9 @@
   gap: var(--ds-space-2);
 }
 .sidebar__section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: var(--ds-fs-sm);
   font-weight: var(--ds-fw-bold);
   color: var(--ds-text-muted);

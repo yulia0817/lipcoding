@@ -9,7 +9,15 @@ from datetime import date, datetime, timedelta, timezone
 from threading import Lock
 from typing import Dict, List
 
-from session_models import Session, SessionCreate, Stats, WeeklySummary, DayBreakdown
+from session_models import (
+    Session,
+    SessionCreate,
+    Stats,
+    WeeklySummary,
+    DayBreakdown,
+    HourBucket,
+    CategoryStat,
+)
 
 # 한국 시간 기준으로 '오늘/날짜'를 계산 (대회 환경)
 KST = timezone(timedelta(hours=9))
@@ -168,6 +176,63 @@ class SessionStore:
                     total_minutes=sum(s.duration_min for s in day_sessions),
                     session_count=len(day_sessions),
                     tasks=tasks,
+                )
+            )
+        return result
+
+
+    def hourly_breakdown(self, days: int = 7) -> List[HourBucket]:
+        """최근 N일 동안의 '시간대(0~23시, KST)별' 집중 분 분포."""
+        with self._lock:
+            sessions = list(self._items.values())
+
+        cutoff = datetime.now(KST).date() - timedelta(days=days - 1)
+        minutes = [0] * 24
+        counts = [0] * 24
+        for s in sessions:
+            local = s.created_at.astimezone(KST)
+            if local.date() >= cutoff:
+                minutes[local.hour] += s.duration_min
+                counts[local.hour] += 1
+
+        return [
+            HourBucket(hour=h, minutes=minutes[h], session_count=counts[h])
+            for h in range(24)
+        ]
+
+    def category_breakdown(self, days: int = 30) -> List[CategoryStat]:
+        """최근 N일 동안의 카테고리별 투자 시간 + 카테고리 내부 태그별 분."""
+        with self._lock:
+            sessions = list(self._items.values())
+
+        cutoff = datetime.now(KST).date() - timedelta(days=days - 1)
+        cat_min: Dict[str, int] = defaultdict(int)
+        cat_cnt: Dict[str, int] = defaultdict(int)
+        cat_tag_min: Dict[str, Dict[str, int]] = defaultdict(lambda: defaultdict(int))
+
+        for s in sessions:
+            if self._local_day(s.created_at) < cutoff:
+                continue
+            cat = s.category or "기타"
+            cat_min[cat] += s.duration_min
+            cat_cnt[cat] += 1
+            for tag in s.tags or []:
+                cat_tag_min[cat][tag] += s.duration_min
+
+        result: List[CategoryStat] = []
+        for cat in sorted(cat_min, key=lambda c: cat_min[c], reverse=True):
+            tags = [
+                {"tag": t, "minutes": m}
+                for t, m in sorted(
+                    cat_tag_min[cat].items(), key=lambda kv: kv[1], reverse=True
+                )
+            ]
+            result.append(
+                CategoryStat(
+                    category=cat,
+                    minutes=cat_min[cat],
+                    session_count=cat_cnt[cat],
+                    tags=tags,
                 )
             )
         return result

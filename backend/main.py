@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import focus, items, voice
+from routers import focus, items, voice, gamify
 
 app = FastAPI(title="Focus Campfire API", version="0.2.0")
 
@@ -20,6 +20,7 @@ app.add_middleware(
 app.include_router(items.router)
 app.include_router(voice.router)
 app.include_router(focus.router)
+app.include_router(gamify.router)
 
 
 @app.get("/")

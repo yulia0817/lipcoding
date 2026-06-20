@@ -17,6 +17,8 @@ class SessionCreate(BaseModel):
     distracted_min: int = Field(default=0, ge=0, le=600, description="딴짓한 분")
     retro: Optional[str] = Field(default=None, max_length=1000, description="한 줄 회고")
     source: str = Field(default="text", description="text | voice")
+    category: str = Field(default="기타", max_length=50, description="공부/운동/업무 등")
+    tags: list[str] = Field(default_factory=list, description="자유 태그")
 
 
 class Session(SessionCreate):
@@ -52,3 +54,16 @@ class DayBreakdown(BaseModel):
     total_minutes: int
     session_count: int
     tasks: list[dict]
+
+
+class HourBucket(BaseModel):
+    hour: int  # 0-23 (KST)
+    minutes: int
+    session_count: int
+
+
+class CategoryStat(BaseModel):
+    category: str
+    minutes: int
+    session_count: int
+    tags: list[dict]  # [{tag, minutes}]

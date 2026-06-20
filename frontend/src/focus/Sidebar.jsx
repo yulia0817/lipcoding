@@ -1,13 +1,25 @@
 import { Button } from '../design'
+import {
+  IconFlame,
+  IconBook,
+  IconCalendar,
+  IconChart,
+  IconClock,
+  IconCoffee,
+  IconTag,
+  IconPalette,
+} from '../design/icons'
 
 const FOCUS_PRESETS = [15, 25, 45, 50]
 const BREAK_PRESETS = [5, 10, 15]
 
 const NAV = [
-  { id: 'campfire', icon: '🔥', label: '캠프파이어' },
-  { id: 'journal', icon: '🪵', label: '불씨 저널' },
-  { id: 'daily', icon: '📅', label: '날짜별 기록' },
-  { id: 'stats', icon: '📊', label: '통계' },
+  { id: 'campfire', Icon: IconFlame, label: '캠프파이어' },
+  { id: 'journal', Icon: IconBook, label: '불씨 저널' },
+  { id: 'daily', Icon: IconCalendar, label: '날짜별 기록' },
+  { id: 'activity', Icon: IconTag, label: '활동 분석' },
+  { id: 'stats', Icon: IconChart, label: '통계' },
+  { id: 'shop', Icon: IconPalette, label: '스킨 보관함' },
 ]
 
 function clamp(v, min, max) {
@@ -30,8 +42,8 @@ export function Sidebar({
     <aside className={`sidebar ${collapsed ? 'is-collapsed' : ''}`}>
       <div className="sidebar__top">
         <span className="sidebar__brand">
-          <span className="sidebar__brand-icon">🔥</span>
-          {!collapsed && <span className="sidebar__brand-text">Focus Campfire</span>}
+          <span className="sidebar__brand-icon"><IconFlame size={22} /></span>
+          {!collapsed && <span className="sidebar__brand-text">Focus Scene</span>}
         </span>
         <button
           className="sidebar__toggle"
@@ -51,7 +63,7 @@ export function Sidebar({
             onClick={() => onNavigate(n.id)}
             title={n.label}
           >
-            <span className="sidebar__nav-icon">{n.icon}</span>
+            <span className="sidebar__nav-icon"><n.Icon /></span>
             {!collapsed && <span className="sidebar__nav-label">{n.label}</span>}
           </button>
         ))}
@@ -59,7 +71,7 @@ export function Sidebar({
 
       {!collapsed && (
         <div className="sidebar__settings">
-          <div className="sidebar__section-title">⏱ 집중 시간</div>
+          <div className="sidebar__section-title"><IconClock size={15} /> 집중 시간</div>
           <div className="sidebar__presets">
             {FOCUS_PRESETS.map((m) => (
               <button
@@ -86,7 +98,7 @@ export function Sidebar({
             <span>분</span>
           </label>
 
-          <div className="sidebar__section-title">☕ 휴식 시간</div>
+          <div className="sidebar__section-title"><IconCoffee size={15} /> 휴식 시간</div>
           <div className="sidebar__presets">
             {BREAK_PRESETS.map((m) => (
               <button

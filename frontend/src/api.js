@@ -2,9 +2,11 @@
 // 로컬에서는 vite proxy(/api → :8000)를 사용하므로 비워둡니다.
 const BASE = import.meta.env.VITE_API_BASE || ''
 
+import { getUserId } from './lib/identity'
+
 async function req(path, options = {}) {
   const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-User-Id': getUserId() },
     ...options,
   })
   if (!res.ok) {
@@ -24,11 +26,13 @@ export const api = {
   captureVoice: (data) =>
     req('/api/voice/capture', { method: 'POST', body: JSON.stringify(data) }),
 
-  // Focus Campfire
+  // Focus Scene
   listSessions: () => req('/api/sessions'),
   createSession: (data) =>
     req('/api/sessions', { method: 'POST', body: JSON.stringify(data) }),
   stats: () => req('/api/stats'),
   weeklySummary: () => req('/api/summary/weekly'),
   dailyBreakdown: () => req('/api/breakdown/daily'),
+  hourlyBreakdown: () => req('/api/breakdown/hourly'),
+  categoryBreakdown: () => req('/api/breakdown/category'),
 }

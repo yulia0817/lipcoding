@@ -1,4 +1,4 @@
-# 🔥 Focus Campfire
+# 🔥 Focus Scene
 
 천하제일 입코딩 대회 출품작 — **음성 기반 포모도로 집중 앱**.
 집중하면 모닥불이 타오르고, 멈추면 사그라듭니다. 매일 집중하면 불이 꺼지지 않습니다.
@@ -11,6 +11,9 @@
 - 🪵 **불씨 저널** — 이번 주 집중 요약(총 집중 시간·불 세기·키워드)과 한 줄 회고 모음
 - 📅 **날짜별 기록** — 날짜별로 무엇에 얼마나 집중했는지 막대로 시각화
 - 📊 **집중 통계** — 오늘 집중 시간, 연속 집중일(streak), 완료 세션 수, 12주 히트맵, 집중 vs 딴짓 비율
+- 🧘 **휴식 스트레칭 코치** — 집중을 완료하면 자동으로 휴식 모드로 전환, 앉아서 하는 가벼운 스트레칭을 안내하고 음성(ko-KR)으로 읽어줌
+- 🎨 **스킨 보관함** — 모닥불 외 벽난로/해변/숲/비/우주/오로라 7가지 테마를 구매 없이 자유롭게 선택, 집중 화면 분위기를 바꿔요
+- 🎮 **게이미피케이션** — 레벨/XP/장작(코인), 일일 퀘스트, 배지, 연속 집중(streak) — 집중을 완료할수록 보상 획득
 - 📝 **한 줄 회고** — 세션 종료 시 음성/텍스트로 회고 기록
 
 ## 구조
@@ -24,9 +27,9 @@ backend/                FastAPI
     items.py, voice.py  범용 CRUD / 음성 캡처 (베이스)
 frontend/               React 18 + Vite
   src/hooks/            usePomodoro(타이머), useSpeech(음성), useLocalStorage(설정)
-  src/focus/            Campfire, Heatmap, FocusRatio, Sidebar
+  src/focus/            Campfire, Heatmap, FocusRatio, Sidebar, BreakCoach, breakActivities
   src/views/            CampfireView, JournalView, DailyView, StatsView
-  src/design/           디자인 시스템 (16개 컴포넌트)
+  src/design/           디자인 시스템 (16개 컴포넌트) + icons(선 아이콘) · 단순 미니멀 토큰
   src/App.jsx           사이드바 + 뷰 전환
 infra/                  Bicep (Azure Container Apps)
 azure.yaml              azd 설정 (backend + frontend)
@@ -55,6 +58,11 @@ npm run dev                    # http://localhost:5173
 | GET  | `/api/stats` | 오늘 집중/streak/히트맵/집중비율 |
 | GET  | `/api/summary/weekly` | 이번 주 집중 요약(총 시간·불 세기·키워드·불씨) |
 | GET  | `/api/breakdown/daily` | 최근 날짜별 집중 집계(작업별 분 단위) |
+| GET  | `/api/profile` | 내 게이미피케이션 프로필(레벨/XP/코인/배지) |
+| POST | `/api/earn` | 세션 완료 시 장작·XP 획득 |
+| GET  | `/api/skins` | 스킨 보관함(선택 상태 포함) |
+| POST | `/api/skins/{id}/equip` | 스킨 선택(장착) |
+| GET  | `/api/quests` | 오늘의 퀘스트 진행도 |
 
 ## 배포 (Azure Container Apps)
 ```bash

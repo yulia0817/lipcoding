@@ -1,31 +1,32 @@
-/* LipCoding 디자인 토큰 — 색상/타이포/간격/반경/그림자 단일 출처 */
+/* LipCoding 디자인 토큰 — 색상/타이포/간격/반경/그림자 단일 출처
+ * 단순(미니멀) 모드: 중립 회색 + near-black 액센트, 얇은 보더, 최소 그림자 */
 :root {
-  /* color: brand */
-  --ds-primary: #4f46e5;
-  --ds-primary-hover: #4338ca;
-  --ds-primary-soft: #eef2ff;
+  /* color: brand — 모노크롬 액센트 */
+  --ds-primary: #18181b;
+  --ds-primary-hover: #000000;
+  --ds-primary-soft: #f4f4f5;
 
-  /* color: semantic */
-  --ds-success: #16a34a;
-  --ds-danger: #ef4444;
+  /* color: semantic — 피드백 용도로만 사용 */
+  --ds-success: #15803d;
+  --ds-danger: #dc2626;
   --ds-danger-soft: #fef2f2;
-  --ds-warning: #d97706;
+  --ds-warning: #b45309;
 
   /* color: neutral */
-  --ds-bg: #f5f5f7;
+  --ds-bg: #fafafa;
   --ds-surface: #ffffff;
-  --ds-border: #e5e7eb;
-  --ds-text: #1f2937;
-  --ds-text-muted: #9ca3af;
+  --ds-border: #ececec;
+  --ds-text: #18181b;
+  --ds-text-muted: #71717a;
 
   /* typography */
-  --ds-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ds-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --ds-fs-sm: 0.85rem;
-  --ds-fs-md: 1rem;
+  --ds-fs-md: 0.95rem;
   --ds-fs-lg: 1.05rem;
-  --ds-fs-xl: 2rem;
+  --ds-fs-xl: 1.6rem;
   --ds-fw-medium: 500;
-  --ds-fw-bold: 700;
+  --ds-fw-bold: 600;
 
   /* spacing (4px scale) */
   --ds-space-1: 4px;
@@ -37,13 +38,13 @@
 
   /* radius */
   --ds-radius-sm: 8px;
-  --ds-radius-md: 10px;
+  --ds-radius-md: 12px;
   --ds-radius-pill: 999px;
 
-  /* shadow */
-  --ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
-  --ds-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* shadow — 거의 보이지 않게 (플랫) */
+  --ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --ds-shadow-md: 0 6px 24px rgba(0, 0, 0, 0.06);
 
   /* focus */
-  --ds-focus-ring: 0 0 0 2px var(--ds-primary);
+  --ds-focus-ring: 0 0 0 3px rgba(24, 24, 27, 0.12);
 }
