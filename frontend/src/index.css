@@ -1,6 +1,47 @@
+@import './design/tokens.css';
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--ds-font);
   margin: 0;
-  padding: 20px;
-  background: #f5f5f5;
+  padding: 0;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--ds-space-6) var(--ds-space-5) 64px;
+}
+
+.app__header h1 {
+  margin: 0;
+  font-size: var(--ds-fs-xl);
+}
+
+.app__sub {
+  margin: var(--ds-space-1) 0 var(--ds-space-5);
+  color: var(--ds-text-muted);
+}
+
+.app__composer {
+  margin-bottom: var(--ds-space-5);
+}
+
+.app__text {
+  font-size: var(--ds-fs-lg);
+}
+
+.app__text--done {
+  text-decoration: line-through;
+  color: var(--ds-text-muted);
+}
+
+.app__empty {
+  text-align: center;
+  color: var(--ds-text-muted);
 }

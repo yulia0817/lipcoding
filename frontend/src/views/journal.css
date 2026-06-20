@@ -1,0 +1,12 @@
+.journal-hero {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+.journal-hero__fire { font-size: 36px; letter-spacing: 2px; }
+.journal-hero__total { font-size: 28px; font-weight: 700; margin: 8px 0 0; }
+.journal-hero__top { color: var(--ds-text-muted, #999); margin: 4px 0 12px; }
+.journal-keywords { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.ember { display: flex; gap: 10px; align-items: baseline; }
+.ember__date { color: var(--ds-text-muted, #999); font-size: 12px; min-width: 84px; }
+.ember__task { font-weight: 600; }
+.ember__retro { color: var(--ds-text-muted, #999); }

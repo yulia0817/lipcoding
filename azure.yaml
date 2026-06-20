@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+name: lipcoding
 metadata:
   template: lipcoding
   description: "LipCoding - 음성 입력 생산성 앱"
@@ -7,7 +9,11 @@ services:
     project: ./backend
     language: python
     host: containerapp
-
-infra:
-  path: ./infra
-  template: bicep
+    docker:
+      path: ./Dockerfile
+  frontend:
+    project: ./frontend
+    language: js
+    host: containerapp
+    docker:
+      path: ./Dockerfile
