@@ -25,7 +25,7 @@ const NAV = [
   { id: 'activity', Icon: IconTag, label: '활동 분석' },
   { id: 'stats', Icon: IconChart, label: '통계' },
   { id: 'github', Icon: IconGit, label: 'GitHub 연동' },
-  { id: 'standup', Icon: IconClipboard, label: '스탠드업' },
+  { id: 'standup', Icon: IconClipboard, label: 'AI 스탠드업' },
   { id: 'shop', Icon: IconPalette, label: '스킨 보관함' },
 ]
 
