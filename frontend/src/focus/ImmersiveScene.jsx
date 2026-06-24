@@ -14,7 +14,7 @@ export function ImmersiveScene({
   modeLabel,
   timeLabel,
   task,
-  taskIcon,
+  taskCategory,
   onExit,
   children,
 }) {

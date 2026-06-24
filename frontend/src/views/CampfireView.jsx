@@ -73,8 +73,10 @@ export function CampfireView({ settings, onSaved, gamify }) {
   }
 
   function startFocus() {
-    if (!task.trim()) {
-      toast('무엇에 집중할지 먼저 입력하세요', { variant: 'info' })
+    // 내용을 비워도 카테고리가 선택돼 있으면 그 이름으로 집중을 시작합니다.
+    const label = task.trim() || category
+    if (!label) {
+      toast('집중할 내용을 적거나 카테고리를 선택하세요', { variant: 'info' })
       return
     }
     if (notif.supported && notif.permission === 'default') notif.request()
@@ -84,7 +86,7 @@ export function CampfireView({ settings, onSaved, gamify }) {
   // 호흡 인트로가 끝난 뒤 실제 집중 타이머를 시작합니다.
   function doStartFocus() {
     setBreathing(false)
-    const t = task.trim()
+    const t = task.trim() || category
     if (!t) return
     pendingSession.current = {
       task: t,
