@@ -97,9 +97,10 @@ export function computeDailyBreakdown(sessions, days = 14, now = new Date()) {
     const entries = daySessions
       .map((s) => {
         const end = new Date(s.created_at)
-        const start = new Date(end.getTime() - s.duration_min * 60000)
+        const startDate = new Date(end.getTime() - s.duration_min * 60000)
         return {
-          start: hhmm(start),
+          _startTs: startDate.getTime(),
+          start: hhmm(startDate),
           end: hhmm(end),
           task: s.task,
           category: s.category,
@@ -111,7 +112,8 @@ export function computeDailyBreakdown(sessions, days = 14, now = new Date()) {
           tags: s.tags || [],
         }
       })
-      .sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0))
+      .sort((a, b) => a._startTs - b._startTs)
+      .map(({ _startTs: _ignored, ...rest }) => rest)
 
     return {
       date,

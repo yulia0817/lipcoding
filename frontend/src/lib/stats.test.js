@@ -76,6 +76,21 @@ describe('computeStats', () => {
     )
     expect(s.streak_days).toBe(1)
   })
+
+  it('streak: 오늘 0분, 어제~3일전 연속 집중 → streak_days === 3', () => {
+    // NOW = 2026-06-24 15:00, 오늘(6/24)은 세션 없음
+    // 6/23, 6/22, 6/21 연속, 6/20 공백, 6/19 존재
+    const s = computeStats(
+      [
+        session({ created_at: isoLocal(2026, 6, 23) }),
+        session({ created_at: isoLocal(2026, 6, 22) }),
+        session({ created_at: isoLocal(2026, 6, 21) }),
+        session({ created_at: isoLocal(2026, 6, 19) }),
+      ],
+      NOW,
+    )
+    expect(s.streak_days).toBe(3)
+  })
 })
 
 describe('computeDailyBreakdown', () => {
