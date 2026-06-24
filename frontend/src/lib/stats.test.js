@@ -122,4 +122,13 @@ describe('computeDailyBreakdown', () => {
     )
     expect(rows).toHaveLength(0)
   })
+
+  it('엔트리는 세션 id를 담는다(삭제 식별용)', () => {
+    const rows = computeDailyBreakdown(
+      [session({ id: 's-abc123', created_at: isoLocal(2026, 6, 24, 9, 0) })],
+      14,
+      NOW,
+    )
+    expect(rows[0].entries[0].id).toBe('s-abc123')
+  })
 })

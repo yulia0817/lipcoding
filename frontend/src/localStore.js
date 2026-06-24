@@ -76,4 +76,10 @@ export const api = {
     })
     await save()
   },
+  async deleteSession(id) {
+    const data = await load()
+    const before = data.sessions.length
+    data.sessions = data.sessions.filter((s) => s.id !== id)
+    if (data.sessions.length !== before) await save()
+  },
 }

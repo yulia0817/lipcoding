@@ -47,4 +47,30 @@ describe('localStore api', () => {
     const stats = await m2.api.stats()
     expect(stats.total_sessions).toBe(1)
   })
+
+  it('deleteSession 은 해당 id 세션만 지우고 영속화한다', async () => {
+    vi.resetModules()
+    const { api } = await import('./localStore')
+    await api.createSession({
+      task: 'A', duration_min: 10, completed: true,
+      distracted_min: 0, retro: null, source: 'text', category: '공부', tags: [],
+    })
+    await api.createSession({
+      task: 'B', duration_min: 20, completed: true,
+      distracted_min: 0, retro: null, source: 'text', category: '공부', tags: [],
+    })
+    const daily = await api.dailyBreakdown()
+    const entries = daily[0].entries
+    expect(entries).toHaveLength(2)
+
+    const targetId = entries.find((e) => e.task === 'A').id
+    await api.deleteSession(targetId)
+
+    // 모듈 캐시 초기화 → localStorage에서 다시 로드(영속 확인)
+    vi.resetModules()
+    const m2 = await import('./localStore')
+    const after = await m2.api.dailyBreakdown()
+    expect(after[0].entries).toHaveLength(1)
+    expect(after[0].entries[0].task).toBe('B')
+  })
 })

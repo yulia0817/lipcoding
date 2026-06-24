@@ -100,6 +100,7 @@ export function computeDailyBreakdown(sessions, days = 14, now = new Date()) {
         const startDate = new Date(end.getTime() - s.duration_min * 60000)
         return {
           _startTs: startDate.getTime(),
+          id: s.id,
           start: hhmm(startDate),
           end: hhmm(end),
           task: s.task,
