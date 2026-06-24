@@ -6,6 +6,7 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { useNotification } from '../hooks/useNotification'
 import { useAmbient } from '../hooks/useAmbient'
 import { useHotkeys } from '../hooks/useHotkeys'
+import { pushTrayTitle, onTrayAction } from '../tray/trayBridge'
 import { FocusScene } from '../focus/FocusScene'
 import { ImmersiveScene } from '../focus/ImmersiveScene'
 import { BreakCoach } from '../focus/BreakCoach'
@@ -188,6 +189,35 @@ export function CampfireView({ settings, onSaved }) {
     if (!sessionLive && immersive) setImmersive(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionLive])
+
+  // 메뉴바 트레이에 남은 시간 push (idle 이면 🔥)
+  useEffect(() => {
+    if (sessionLive) {
+      const mm = String(Math.floor(timer.remaining / 60)).padStart(2, '0')
+      const ss = String(timer.remaining % 60).padStart(2, '0')
+      pushTrayTitle(`🔥 ${mm}:${ss}`)
+    } else {
+      pushTrayTitle('🔥')
+    }
+  }, [timer.remaining, sessionLive])
+
+  // 트레이 메뉴(시작/일시정지/종료) → 타이머 제어
+  useEffect(() => {
+    let unlisten = () => {}
+    onTrayAction((action) => {
+      if (action === 'start') {
+        if (idle) startFocus()
+        else if (pendingSession.current) pauseOrResume()
+      } else if (action === 'pause') {
+        if (pendingSession.current) pauseOrResume()
+      } else if (action === 'stop') {
+        if (breakMode) timer.reset('focus')
+        else if (pendingSession.current) stopFocus()
+      }
+    }).then((u) => (unlisten = u))
+    return () => unlisten()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idle, breakMode])
 
   // 키보드 단축키: Space=시작/정지, R=리셋, S=건너뛰기
   useHotkeys({
