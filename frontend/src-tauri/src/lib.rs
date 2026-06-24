@@ -16,16 +16,16 @@ pub fn run() {
             let start_i = MenuItem::with_id(app, "start", "시작", true, None::<&str>)?;
             let pause_i = MenuItem::with_id(app, "pause", "일시정지/재개", true, None::<&str>)?;
             let stop_i = MenuItem::with_id(app, "stop", "종료", true, None::<&str>)?;
-            let sep = PredefinedMenuItem::separator(app)?;
+            let sep1 = PredefinedMenuItem::separator(app)?;
+            let sep2 = PredefinedMenuItem::separator(app)?;
             let open_i = MenuItem::with_id(app, "open", "열기", true, None::<&str>)?;
             let quit_i = MenuItem::with_id(app, "quit", "끝내기", true, None::<&str>)?;
             let menu = Menu::with_items(
                 app,
-                &[&start_i, &pause_i, &stop_i, &sep, &open_i, &sep, &quit_i],
+                &[&start_i, &pause_i, &stop_i, &sep1, &open_i, &sep2, &quit_i],
             )?;
 
-            let tray = TrayIconBuilder::with_id("main-tray")
-                .icon(app.default_window_icon().unwrap().clone())
+            let mut tray_builder = TrayIconBuilder::with_id("main-tray")
                 .icon_as_template(true)
                 .title("🔥")
                 .menu(&menu)
@@ -41,8 +41,11 @@ pub fn run() {
                     other => {
                         let _ = app.emit("tray-action", other.to_string());
                     }
-                })
-                .build(app)?;
+                });
+            if let Some(icon) = app.default_window_icon() {
+                tray_builder = tray_builder.icon(icon.clone());
+            }
+            let tray = tray_builder.build(app)?;
 
             app.manage(TrayState(std::sync::Mutex::new(tray)));
             Ok(())
