@@ -1,9 +1,7 @@
 import { Card, EmptyState } from '../design'
 import { FocusRatio } from '../focus/FocusRatio'
-import { QuestPanel } from '../gamify/QuestPanel'
-import { BadgeShelf } from '../gamify/BadgeShelf'
 
-export function StatsView({ stats, gamify }) {
+export function StatsView({ stats }) {
   if (!stats) {
     return <EmptyState icon="📊" title="통계를 불러오는 중" description="잠시만요." />
   }
@@ -32,12 +30,6 @@ export function StatsView({ stats, gamify }) {
           />
         </div>
       </Card>
-
-      <div className="section-title">오늘의 퀘스트</div>
-      <Card><QuestPanel quests={gamify?.quests} /></Card>
-
-      <div className="section-title">배지</div>
-      <Card><BadgeShelf badges={gamify?.profile?.badges} /></Card>
     </>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api } from '../api'
+import { api } from '../localStore'
 import { Card, EmptyState, Stack, useToast } from '../design'
 import './daily.css'
 
