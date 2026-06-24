@@ -2,16 +2,11 @@ import { Button } from '../design'
 import './slider.css'
 import {
   IconFlame,
-  IconBook,
   IconCalendar,
   IconChart,
   IconClock,
   IconCoffee,
-  IconTag,
   IconPalette,
-  IconUsers,
-  IconGit,
-  IconClipboard,
 } from '../design/icons'
 
 const FOCUS_PRESETS = [15, 25, 45, 50]
@@ -19,14 +14,9 @@ const BREAK_PRESETS = [5, 10, 15]
 
 const NAV = [
   { id: 'campfire', Icon: IconFlame, label: '집중 타이머' },
-  { id: 'together', Icon: IconUsers, label: '같이 집중' },
-  { id: 'journal', Icon: IconBook, label: '주간 리포트' },
   { id: 'daily', Icon: IconCalendar, label: '날짜별 기록' },
-  { id: 'activity', Icon: IconTag, label: '활동 분석' },
   { id: 'stats', Icon: IconChart, label: '통계' },
-  { id: 'github', Icon: IconGit, label: 'GitHub 연동' },
-  { id: 'standup', Icon: IconClipboard, label: 'AI 스탠드업' },
-  { id: 'shop', Icon: IconPalette, label: '스킨 보관함' },
+  { id: 'skins', Icon: IconPalette, label: '스킨' },
 ]
 
 function clamp(v, min, max) {

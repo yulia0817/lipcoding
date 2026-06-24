@@ -57,10 +57,28 @@
 }
 .tl-row {
   display: grid;
-  grid-template-columns: 92px 12px 1fr;
+  grid-template-columns: 92px 12px 1fr auto;
   align-items: start;
   gap: 8px;
   padding: 6px 0;
+}
+.tl-del {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ds-text-muted, #999);
+  opacity: 0.45;
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 6px;
+  align-self: center;
+  transition: opacity 0.12s, color 0.12s, background 0.12s;
+}
+.tl-del:hover {
+  opacity: 1;
+  color: #e5484d;
+  background: var(--ds-border, rgba(229, 72, 77, 0.12));
 }
 .tl-time {
   font-size: 12px;

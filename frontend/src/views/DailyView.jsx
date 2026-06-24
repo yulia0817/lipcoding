@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { api } from '../api'
-import { Card, EmptyState, Stack, useToast } from '../design'
+import { useCallback, useEffect, useState } from 'react'
+import { api } from '../localStore'
+import { Button, Card, EmptyState, Modal, Stack, useToast } from '../design'
 import './daily.css'
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
@@ -14,15 +14,32 @@ function fmtDate(iso) {
 
 export function DailyView() {
   const [days, setDays] = useState(null)
+  const [pendingDelete, setPendingDelete] = useState(null) // { id, task, start, end }
   const { toast } = useToast()
 
-  useEffect(() => {
-    api
+  const refresh = useCallback(() => {
+    return api
       .dailyBreakdown()
       .then(setDays)
       .catch((e) => toast(`기록 불러오기 실패: ${e}`, { variant: 'error' }))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [toast])
+
+  useEffect(() => {
+    refresh()
+  }, [refresh])
+
+  async function confirmDelete() {
+    const target = pendingDelete
+    setPendingDelete(null)
+    if (!target) return
+    try {
+      await api.deleteSession(target.id)
+      toast('기록을 삭제했어요', { variant: 'success' })
+      await refresh()
+    } catch (e) {
+      toast(`삭제 실패: ${e}`, { variant: 'error' })
+    }
+  }
 
   if (!days) {
     return <EmptyState icon="📅" title="기록을 불러오는 중" description="잠시만요." />
@@ -74,7 +91,7 @@ export function DailyView() {
                   {d.entries.map((e, i) => (
                     <div
                       className={`tl-row${e.completed ? '' : ' tl-row--incomplete'}`}
-                      key={`${e.start}-${i}`}
+                      key={e.id || `${e.start}-${i}`}
                     >
                       <span className="tl-time">
                         {e.start}–{e.end}
@@ -91,12 +108,25 @@ export function DailyView() {
                               딴짓 {e.distracted_min}분
                             </span>
                           )}
-                          {e.source === 'voice' && (
-                            <span className="tl-badge tl-badge--voice">음성</span>
-                          )}
                         </div>
                         {e.retro && <div className="tl-retro">“{e.retro}”</div>}
                       </div>
+                      <button
+                        type="button"
+                        className="tl-del"
+                        aria-label="이 기록 삭제"
+                        title="삭제"
+                        onClick={() =>
+                          setPendingDelete({
+                            id: e.id,
+                            task: e.task,
+                            start: e.start,
+                            end: e.end,
+                          })
+                        }
+                      >
+                        ✕
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -105,6 +135,29 @@ export function DailyView() {
           )
         })}
       </Stack>
+
+      <Modal
+        open={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        title="기록 삭제"
+        footer={
+          <Stack row gap={2}>
+            <Button variant="secondary" onClick={() => setPendingDelete(null)}>
+              취소
+            </Button>
+            <Button variant="danger" onClick={confirmDelete}>
+              삭제
+            </Button>
+          </Stack>
+        }
+      >
+        {pendingDelete && (
+          <p>
+            <strong>{pendingDelete.task}</strong> ({pendingDelete.start}–
+            {pendingDelete.end}) 기록을 삭제할까요? 되돌릴 수 없어요.
+          </p>
+        )}
+      </Modal>
     </>
   )
 }

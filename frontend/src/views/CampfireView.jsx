@@ -1,44 +1,39 @@
 import { useEffect, useRef, useState } from 'react'
-import { api } from '../api'
-import { Button, Card, IconButton, Input, Modal, Stack, useToast } from '../design'
+import { api } from '../localStore'
+import { Button, Card, Input, Modal, Stack, useToast } from '../design'
 import { usePomodoro, formatTime } from '../hooks/usePomodoro'
-import { useSpeech } from '../hooks/useSpeech'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { useNotification } from '../hooks/useNotification'
 import { useAmbient } from '../hooks/useAmbient'
 import { useHotkeys } from '../hooks/useHotkeys'
-import { useDailyGoal } from '../hooks/useDailyGoal'
+import { pushTrayTitle, onTrayAction } from '../tray/trayBridge'
 import { FocusScene } from '../focus/FocusScene'
 import { ImmersiveScene } from '../focus/ImmersiveScene'
 import { BreakCoach } from '../focus/BreakCoach'
 import { BreathingIntro } from '../focus/BreathingIntro'
 import { AmbientToolbar } from '../focus/AmbientToolbar'
-import { DailyGoal } from '../focus/DailyGoal'
 import { CategoryTagPicker, CategoryIcon } from '../focus/CategoryTagPicker'
-import { IconEdit, IconCoffee, IconMic, IconMaximize } from '../design/icons'
+import { IconEdit, IconCoffee, IconMaximize } from '../design/icons'
 import '../focus/quickwins.css'
 
 const LONG_BREAK_EVERY = 4
 const LONG_BREAK_MIN = 15
 
 // 집중 타이머 + 모닥불 메인 뷰. 시간 설정은 사이드바에서 props로 받습니다.
-export function CampfireView({ settings, onSaved, gamify }) {
+export function CampfireView({ settings, onSaved }) {
   const [task, setTask] = useState('')
   const [category, setCategory] = useState('공부')
   const [tags, setTags] = useState([])
   const [retroOpen, setRetroOpen] = useState(false)
   const [retro, setRetro] = useState('')
-  const [voiceUsed, setVoiceUsed] = useState(false)
   const [breathing, setBreathing] = useState(false)
   const [immersive, setImmersive] = useState(false)
   const [pendingBreak, setPendingBreak] = useState(false)
   const [cycleCount, setCycleCount] = useState(0)
   const pendingSession = useRef(null)
   const { toast } = useToast()
-  const speech = useSpeech()
   const notif = useNotification()
   const ambient = useAmbient()
-  const goal = useDailyGoal()
 
   // 4세션마다 긴 휴식. 휴식 길이를 타이머 훅에 직접 반영해 자연스럽게 전환됩니다.
   const isLongBreak = cycleCount > 0 && cycleCount % LONG_BREAK_EVERY === 0
@@ -55,7 +50,6 @@ export function CampfireView({ settings, onSaved, gamify }) {
     if (timer.finished && timer.mode === 'focus' && pendingSession.current) {
       pendingSession.current.completed = true
       setCycleCount((c) => c + 1)
-      goal.markDone()
       notif.notify('집중 완료!', '장작 하나가 추가됐어요. 잠깐 쉬어볼까요?')
       setRetroOpen(true)
       toast('집중 완료! 모닥불이 활활 타올랐어요', { variant: 'success' })
@@ -63,18 +57,11 @@ export function CampfireView({ settings, onSaved, gamify }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer.finished])
 
-  function dictate(setter) {
-    if (!speech.supported) {
-      toast('이 브라우저는 음성 입력을 지원하지 않아요', { variant: 'info' })
-      return
-    }
-    setVoiceUsed(true)
-    speech.start((text) => setter(text))
-  }
-
   function startFocus() {
-    if (!task.trim()) {
-      toast('무엇에 집중할지 먼저 입력하세요', { variant: 'info' })
+    // 내용을 비워도 카테고리가 선택돼 있으면 그 이름으로 집중을 시작합니다.
+    const label = task.trim() || category
+    if (!label) {
+      toast('집중할 내용을 적거나 카테고리를 선택하세요', { variant: 'info' })
       return
     }
     if (notif.supported && notif.permission === 'default') notif.request()
@@ -84,12 +71,12 @@ export function CampfireView({ settings, onSaved, gamify }) {
   // 호흡 인트로가 끝난 뒤 실제 집중 타이머를 시작합니다.
   function doStartFocus() {
     setBreathing(false)
-    const t = task.trim()
+    const t = task.trim() || category
     if (!t) return
     pendingSession.current = {
       task: t,
       completed: false,
-      source: voiceUsed ? 'voice' : 'text',
+      source: 'text',
       category,
       tags: [...tags],
     }
@@ -149,14 +136,6 @@ export function CampfireView({ settings, onSaved, gamify }) {
         tags: p.tags || [],
       })
       toast('세션을 기록했어요', { variant: 'success' })
-      if (gamify) {
-        const result = await gamify.earn(durationMin, p.completed)
-        if (result?.leveled_up) {
-          toast(`레벨 업! Lv.${result.new_level}`, { variant: 'success' })
-        } else {
-          toast(`+${result.coins_gained} 장작 획득`, { variant: 'info' })
-        }
-      }
     } catch (e) {
       toast(`저장 실패: ${e}`, { variant: 'error' })
     } finally {
@@ -165,7 +144,6 @@ export function CampfireView({ settings, onSaved, gamify }) {
       setRetroOpen(false)
       setTask('')
       setTags([])
-      setVoiceUsed(false)
       timer.resetDistraction()
       // 집중을 끝까지 완료했으면 휴식 모드로 전환(4세션마다 긴 휴식).
       if (wasCompleted) {
@@ -212,27 +190,34 @@ export function CampfireView({ settings, onSaved, gamify }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionLive])
 
-  // 같이 집중: 집중 중에는 내 모임에 30초마다 접속 신호(heartbeat)를 보냅니다.
+  // 메뉴바 트레이에 남은 시간 push (idle 이면 🔥)
   useEffect(() => {
-    if (!active) return undefined
-    let stopped = false
-    async function beat() {
-      try {
-        const mine = await api.myGroups()
-        if (stopped || !mine.length) return
-        const t = pendingSession.current?.task || '집중'
-        await Promise.allSettled(mine.map((g) => api.groupHeartbeat(g.id, t)))
-      } catch {
-        /* 무시 */
+    if (sessionLive) {
+      const mm = String(Math.floor(timer.remaining / 60)).padStart(2, '0')
+      const ss = String(timer.remaining % 60).padStart(2, '0')
+      pushTrayTitle(`🔥 ${mm}:${ss}`)
+    } else {
+      pushTrayTitle('🔥')
+    }
+  }, [timer.remaining, sessionLive])
+
+  // 트레이 메뉴(시작/일시정지/종료) → 타이머 제어
+  useEffect(() => {
+    let unlisten = () => {}
+    onTrayAction((action) => {
+      if (action === 'start') {
+        if (idle) startFocus()
+        else if (pendingSession.current) pauseOrResume()
+      } else if (action === 'pause') {
+        if (pendingSession.current) pauseOrResume()
+      } else if (action === 'stop') {
+        if (breakMode) timer.reset('focus')
+        else if (pendingSession.current) stopFocus()
       }
-    }
-    beat()
-    const h = setInterval(beat, 30000)
-    return () => {
-      stopped = true
-      clearInterval(h)
-    }
-  }, [active])
+    }).then((u) => (unlisten = u))
+    return () => unlisten()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idle, breakMode])
 
   // 키보드 단축키: Space=시작/정지, R=리셋, S=건너뛰기
   useHotkeys({
@@ -258,11 +243,11 @@ export function CampfireView({ settings, onSaved, gamify }) {
       <BreathingIntro
         open={breathing}
         onDone={doStartFocus}
-        skinId={gamify?.profile?.equipped_skin || 'campfire'}
+        skinId={settings.skin || 'campfire'}
       />
       {immersive && sessionLive && (
         <ImmersiveScene
-          skinId={gamify?.profile?.equipped_skin || 'campfire'}
+          skinId={settings.skin || 'campfire'}
           ambient={ambient}
           intensity={intensity}
           active={active}
@@ -308,12 +293,6 @@ export function CampfireView({ settings, onSaved, gamify }) {
         />
       ) : (
       <>
-      <DailyGoal
-        goal={goal.goal}
-        progress={goal.progress}
-        onGoal={goal.setGoal}
-        reached={goal.reached}
-      />
       <AmbientToolbar ambient={ambient} notif={notif} />
       {idle && (
         <div className="hero-guide">
@@ -328,7 +307,7 @@ export function CampfireView({ settings, onSaved, gamify }) {
 
       <Card>
         <FocusScene
-          skinId={gamify?.profile?.equipped_skin || 'campfire'}
+          skinId={settings.skin || 'campfire'}
           intensity={intensity}
           active={active}
           ambient={ambient.current}
@@ -353,14 +332,9 @@ export function CampfireView({ settings, onSaved, gamify }) {
               value={task}
               onChange={(e) => setTask(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && startFocus()}
-              placeholder="무엇에 집중할까요? (음성/텍스트)"
+              placeholder="무엇에 집중할까요?"
               autoFocus
             />
-            {speech.supported && (
-              <IconButton aria-label="음성 입력" onClick={() => dictate(setTask)}>
-                <IconMic size={18} style={{ color: speech.listening ? '#e5484d' : undefined }} />
-              </IconButton>
-            )}
             <Button onClick={startFocus}>시작</Button>
           </Stack>
         )}
@@ -407,7 +381,7 @@ export function CampfireView({ settings, onSaved, gamify }) {
         footer={<Button onClick={saveSession}>기록하기</Button>}
       >
         <p style={{ marginTop: 0, color: 'var(--ds-text-muted)' }}>
-          이번 집중은 어땠나요? (음성/텍스트, 생략 가능)
+          이번 집중은 어땠나요? (생략 가능)
         </p>
         <Stack row gap={2}>
           <Input
@@ -417,11 +391,6 @@ export function CampfireView({ settings, onSaved, gamify }) {
             placeholder="예: 생각보다 잘 집중됐다"
             autoFocus
           />
-          {speech.supported && (
-            <IconButton aria-label="음성 회고" onClick={() => dictate(setRetro)}>
-              <IconMic size={18} style={{ color: speech.listening ? '#e5484d' : undefined }} />
-            </IconButton>
-          )}
         </Stack>
       </Modal>
     </>
