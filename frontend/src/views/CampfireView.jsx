@@ -331,7 +331,9 @@ export function CampfireView({ settings, onSaved }) {
             <Input
               value={task}
               onChange={(e) => setTask(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && startFocus()}
+              onKeyDown={(e) =>
+                e.key === 'Enter' && !e.nativeEvent.isComposing && startFocus()
+              }
               placeholder="무엇에 집중할까요?"
               autoFocus
             />
@@ -387,7 +389,9 @@ export function CampfireView({ settings, onSaved }) {
           <Input
             value={retro}
             onChange={(e) => setRetro(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && saveSession()}
+            onKeyDown={(e) =>
+              e.key === 'Enter' && !e.nativeEvent.isComposing && saveSession()
+            }
             placeholder="예: 생각보다 잘 집중됐다"
             autoFocus
           />
