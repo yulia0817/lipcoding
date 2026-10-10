@@ -19,16 +19,27 @@
         "height": 720,
         "resizable": true,
         "visible": true,
-        "skipTaskbar": true
+        "skipTaskbar": true,
+        "backgroundThrottling": "disabled"
       }
     ],
-    "security": { "csp": null }
+    "security": {
+      "csp": null
+    }
   },
   "bundle": {
     "active": true,
-    "targets": ["app", "dmg"],
-    "icon": ["icons/icon.png", "icons/icon.icns"],
+    "targets": [
+      "app",
+      "dmg"
+    ],
+    "icon": [
+      "icons/icon.png",
+      "icons/icon.icns"
+    ],
     "category": "Productivity"
   },
-  "plugins": { "fs": {} }
+  "plugins": {
+    "fs": {}
+  }
 }

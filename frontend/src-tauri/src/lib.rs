@@ -18,6 +18,7 @@ fn show_main(app: &tauri::AppHandle) {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_notification::init())
         .setup(|app| {
             let start_i = MenuItem::with_id(app, "start", "시작", true, None::<&str>)?;
             let pause_i = MenuItem::with_id(app, "pause", "일시정지/재개", true, None::<&str>)?;

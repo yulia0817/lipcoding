@@ -1,12 +1,12 @@
 import { Modal } from '../design'
-import { IconKeyboard, IconVolume, IconPalette } from '../design/icons'
+import { IconKeyboard, IconVolume, IconPalette, IconFlame } from '../design/icons'
 import './howto.css'
 
 const STEPS = [
   {
     n: '1',
     title: '집중할 일 적기',
-    desc: '“무엇에 집중할까요?” 칸에 할 일을 적어요. 음성(🎤)으로도 입력할 수 있어요. 카테고리·태그도 달 수 있어요.',
+    desc: '“무엇에 집중할까요?” 칸에 할 일을 적어요. 비워두면 고른 카테고리 이름으로 시작해요. 카테고리·태그도 달 수 있어요.',
   },
   {
     n: '2',
@@ -26,14 +26,15 @@ const STEPS = [
   {
     n: '5',
     title: '기록 보기',
-    desc: '주간 리포트·날짜별 기록·활동 분석·통계에서 내가 무엇에 얼마나 집중했는지 한눈에 볼 수 있어요.',
+    desc: '날짜별 기록·통계에서 내가 무엇에 얼마나 집중했는지 한눈에 볼 수 있어요. 기록은 ✕로 하나씩 지울 수 있어요.',
   },
 ]
 
 const TIPS = [
   [IconKeyboard, '단축키', 'Space 시작/정지 · R 리셋 · S 건너뛰기'],
   [IconVolume, '배경 소리', '모닥불·빗소리·숲 소리를 켜면 화면 분위기도 같이 바뀌어요. (저장되지 않는 일시 효과)'],
-  [IconPalette, '스킨 보관함', '원하는 스킨을 고르면 집중 화면과 준비 화면 전체 분위기가 바뀌어요. (저장됨)'],
+  [IconPalette, '스킨', '원하는 스킨을 고르면 집중 화면과 준비 화면 전체 분위기가 바뀌어요. (저장됨)'],
+  [IconFlame, '메뉴바', '창을 닫아도 타이머는 계속 돌아요. 메뉴바 🔥나 Dock 아이콘을 누르면 다시 열려요. 집중·휴식이 끝나면 알림이 와요.'],
 ]
 
 export function HowToGuide({ open, onClose }) {
