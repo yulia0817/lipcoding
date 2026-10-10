@@ -148,7 +148,7 @@ export function Sidebar({
       )}
 
       {!collapsed && (
-        <div className="sidebar__foot">설정은 이 브라우저에 저장돼요</div>
+        <div className="sidebar__foot">설정은 이 컴퓨터에 저장돼요</div>
       )}
     </aside>
   )
